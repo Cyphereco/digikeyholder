@@ -20,6 +20,12 @@ void main() async {
   // Read appKey from the securestorage
   var _appKey = await getAppKey();
 
+  // restore user pin
+  userPin = await getUserPin() ?? '';
+
+  // restore saved keys
+  await loadKeys();
+
   // if appkey entry existed, restore it, otherwise, create a new one
   if (_appKey == null) {
     await setAppKey(DigiKey().toString());
@@ -73,31 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _useBioAuth = false;
 
   @override
-  void initState() {
-    authMe(context);
-    loadKeys();
-    super.initState();
-  }
-
-  void loadKeys() async {
-    allKeys.clear();
-
-    var entries = await readAllEntries();
-    entries.forEach(
-      (key, value) async {
-        if (key != strAppKey && key != strUserPin) {
-          var _hex = await readEntry(key) ?? '';
-          if (_hex.isNotEmpty) {
-            setState(() {
-              allKeys[key] = DigiKey.restore(_hex).publicKey.toCompressedHex();
-            });
-          }
-        }
-      },
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -111,13 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute<void>(
                         builder: (context) => const AddKey() //SignMessage(),
-                        )).then((value) {
-                  setState(() {
-                    loadKeys();
-                  });
-                }).whenComplete(() {
-                  setState(() {});
-                });
+                        ));
               },
               icon: const Icon(Icons.add)),
           IconButton(
@@ -229,8 +204,8 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context, builder: (context) => DeleteConfirmationDialog(''));
     if (result ?? false) {
       // clearKeys();
-      setState(() {
-        loadKeys();
+      setState(() async {
+        await loadKeys();
       });
     }
   }
@@ -265,8 +240,8 @@ class _MyHomePageState extends State<MyHomePage> {
         if (result ?? false) {
           logger.i('Delete Key [${keySel.key}]');
           // deleteKey(keySel.key);
-          setState(() {
-            loadKeys();
+          setState(() async {
+            await loadKeys();
           });
         }
         break;
@@ -279,8 +254,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // var old = await getKey(keySel.key);
           // deleteKey(keySel.key);
           // saveKey(result!, old.privatekey.toHex());
-          setState(() {
-            loadKeys();
+          setState(() async {
+            await loadKeys();
           });
         }
         break;
@@ -292,11 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute<void>(
               builder: (context) => SignMessage(keySel.key),
             )).then((value) {
-          setState(() {
-            loadKeys();
+          setState(() async {
+            await loadKeys();
           });
-        }).whenComplete(() {
-          setState(() {});
         });
         break;
       case KeyActions.encdec:

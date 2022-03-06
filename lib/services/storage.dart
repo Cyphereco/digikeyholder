@@ -8,6 +8,22 @@ const strAppKey = 'appKey';
 const strUserPin = 'userPin';
 
 Map<String, String> allKeys = {};
+String userPin = '';
+
+Future<void> loadKeys() async {
+  allKeys.clear();
+
+  var entries = await readAllEntries();
+
+  for (var key in entries.keys) {
+    if (key != strAppKey && key != strUserPin) {
+      var _hex = await readEntry(key) ?? '';
+      if (_hex.isNotEmpty) {
+        allKeys[key] = DigiKey.restore(_hex).publicKey.toCompressedHex();
+      }
+    }
+  }
+}
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 
@@ -26,7 +42,10 @@ void resetAppKey() => storage.delete(key: strAppKey);
 
 Future<bool> isUserPinSet() async => await readEntry(strUserPin) != null;
 
-void setUserPin(String value) => writeEntry(strUserPin, value);
+void setUserPin(String value) {
+  writeEntry(strUserPin, value);
+  userPin = value;
+}
 
 Future<String?> getUserPin() async => await readEntry(strUserPin);
 
