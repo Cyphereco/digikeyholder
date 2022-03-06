@@ -1,5 +1,5 @@
 import 'package:base_codecs/base_codecs.dart';
-import 'package:digikeyholder/model.dart';
+import 'package:digikeyholder/models/digikey.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:flutter_test/flutter_test.dart';
 

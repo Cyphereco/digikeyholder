@@ -1,11 +1,13 @@
 import 'package:base_codecs/base_codecs.dart';
-import 'package:digikeyholder/model.dart';
+import 'package:digikeyholder/models/digikey.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const storage = FlutterSecureStorage();
 
 const strAppKey = 'appKey';
 const strUserPin = 'userPin';
+
+Map<String, String> allKeys = {};
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 

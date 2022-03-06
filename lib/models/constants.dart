@@ -1,3 +1,5 @@
+const appName = 'DigiKey Holder';
+
 enum KeyActions {
   sign,
   encdec,
