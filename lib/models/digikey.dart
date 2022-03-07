@@ -1,16 +1,21 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:crypto/crypto.dart';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
+import 'package:ecdsa/ecdsa.dart';
 import 'package:encryptor/encryptor.dart';
+
+var s256 = getS256();
 
 class DigiKey {
   late final PrivateKey _k;
 
-  DigiKey() : _k = getS256().generatePrivateKey();
+  DigiKey() : _k = s256.generatePrivateKey();
 
-  DigiKey.restore(String hex) : _k = PrivateKey.fromHex(getS256(), hex);
+  DigiKey.restore(String hex) : _k = PrivateKey.fromHex(s256, hex);
 
   get publicKey => _k.publicKey;
 
@@ -21,7 +26,7 @@ class DigiKey {
     while (_sk == null) {
       try {
         _sk = computeSecretHex(_k, p);
-        // print(getS256().isOnCurve(PublicKey.fromHex(getS256(), _sk)));
+        // print(_s256.isOnCurve(PublicKey.fromHex(_s256, _sk)));
       } catch (e) {
         _sk = null;
       }
@@ -31,8 +36,8 @@ class DigiKey {
 
   PrivateKey deriveWithScalar(Uint8List scalar) {
     return PrivateKey.fromHex(
-        getS256(),
-        ((BigInt.parse(hexEncode(scalar), radix: 16) * _k.D) % getS256().n)
+        s256,
+        ((BigInt.parse(hexEncode(scalar), radix: 16) * _k.D) % s256.n)
             .toRadixString(16));
   }
 
@@ -41,6 +46,25 @@ class DigiKey {
 
   String decryptString(String c, [PublicKey? p]) => Encryptor.decrypt(
       p == null || p == _k.publicKey ? _k.toHex() : computeShareKey(p), c);
+
+  bool verify({required String data, required String sig}) =>
+      signatueVerify(publicKey, _toHash(data), sig);
+
+  String sign(String data) => signature(_k, _toHash(data)).toDERHex();
+
+  Uint8List _toHash(String data) {
+    bool isHashValue = false;
+    if (data.length == 64) {
+      try {
+        hexEncode(hexDecode(data));
+        isHashValue = true;
+      } catch (_) {
+        // ignore
+      }
+    }
+
+    return isHashValue ? hexDecode(data) : hexDecode(hashMsgSha256(data));
+  }
 
   @override
   String toString() => _k.toHex();
@@ -54,18 +78,10 @@ class DigiKey {
   int get hashCode => Object.hash(_k, publicKey);
 }
 
-class KeyListItem {
-  String id = '';
-  String pubkey = '';
-
-  @override
-  String toString() => {'id': id, 'pub': pubkey}.toString();
-}
-
 PublicKey? publicKeyMul(PublicKey p, List<int> mul) =>
-    PublicKey.fromPoint(getS256(), getS256().scalarMul(p, mul));
+    PublicKey.fromPoint(s256, s256.scalarMul(p, mul));
 
-PublicKey hexToPublicKey(String hex) => PublicKey.fromHex(getS256(), hex);
+PublicKey hexToPublicKey(String hex) => PublicKey.fromHex(s256, hex);
 
 String randomID() => _randomValue(3) + '-' + _randomValue(3);
 
@@ -77,3 +93,9 @@ String _randomValue(int length) {
 
   return String.fromCharCodes(codeUnits);
 }
+
+String hashMsgSha256(String data) =>
+    sha256.convert(utf8.encode(data)).toString();
+
+bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
+    verify(key, msgHash, Signature.fromDERHex(sig));

@@ -4,7 +4,8 @@ import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/storage.dart';
 
 class AddKey extends StatefulWidget {
-  const AddKey({Key? key}) : super(key: key);
+  const AddKey({required this.keyMap, Key? key}) : super(key: key);
+  final Map<String, String> keyMap;
 
   @override
   State<AddKey> createState() => _AddKeyState();
@@ -75,9 +76,11 @@ class _AddKeyState extends State<AddKey> {
               maxLength: 64,
               onChanged: ((value) {
                 setState(() {
-                  _publicKey.text = DigiKey.restore(_privateKey.text)
-                      .publicKey
-                      .toCompressedHex();
+                  _publicKey.text = value.isEmpty
+                      ? value
+                      : DigiKey.restore(_privateKey.text)
+                          .publicKey
+                          .toCompressedHex();
                 });
               }),
               controller: _privateKey,
@@ -89,12 +92,17 @@ class _AddKeyState extends State<AddKey> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
           child: TextField(
+            onChanged: (value) => setState(() {}),
             controller: _id,
             autofocus: true,
             decoration: const InputDecoration(label: Text('ID (Key Alias)')),
           ),
         ),
-        TextButton(onPressed: () => _saveKey(), child: const Text('Save')),
+        TextButton(
+            onPressed: (_publicKey.text.isEmpty || _id.text.isEmpty)
+                ? null
+                : () => _saveKey(),
+            child: const Text('Save')),
       ]),
     );
   }
@@ -104,7 +112,7 @@ class _AddKeyState extends State<AddKey> {
       var msg = '';
       if (_id.text.isEmpty) {
         msg = 'Key ID cannot be empty!';
-      } else if (allKeys.containsKey(_id.text)) {
+      } else if (widget.keyMap.containsKey(_id.text)) {
         msg = 'Key ID duplicated! Please use a different ID.';
       } else if (_privateKey.text.isEmpty) {
         msg = 'Private Key cannot be empty!';

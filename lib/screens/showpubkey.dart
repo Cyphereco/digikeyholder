@@ -1,11 +1,11 @@
 import 'dart:math';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/constants.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:digikeyholder/services/copytoclipboard.dart';
 
 class ShowPublicKey extends StatefulWidget {
   const ShowPublicKey(this._id, this._pubkey, {Key? key}) : super(key: key);
@@ -101,13 +101,8 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   controller: _pubKey,
                   readOnly: true,
                   onTap: () {
-                    Clipboard.setData(ClipboardData(text: _pubKey.text));
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Key copied.'),
-                      // backgroundColor: Colors.green,
-                      duration: Duration(seconds: 4),
-                    ));
+                    copyToClipboardWithNotify(context, _pubKey.text,
+                        '${pubKeyFormatText[_format.name]} Publc Key');
                   },
                 )),
             TextButton(

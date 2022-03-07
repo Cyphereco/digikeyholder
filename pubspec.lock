@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  ecdsa:
+    dependency: "direct main"
+    description:
+      name: ecdsa
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   elliptic:
     dependency: "direct main"
     description:
@@ -226,6 +233,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
+  ninja_asn1:
+    dependency: transitive
+    description:
+      name: ninja_asn1
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   path:
     dependency: transitive
     description:

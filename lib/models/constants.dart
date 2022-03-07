@@ -1,4 +1,5 @@
-const appName = 'DigiKey Holder';
+const txtAppName = 'DigiKey Holder';
+const txtSignature = 'Signature';
 
 enum KeyActions {
   sign,

@@ -7,22 +7,48 @@ const storage = FlutterSecureStorage();
 const strAppKey = 'appKey';
 const strUserPin = 'userPin';
 
-Map<String, String> allKeys = {};
 String userPin = '';
 
-Future<void> loadKeys() async {
-  allKeys.clear();
+Future<Map<String, String>> getAllKeys() async {
+  Map<String, String> _keys = {};
+  final _sk = await getAppKey();
+  if (_sk == null) return _keys;
+
+  final _appKey = DigiKey.restore(_sk);
 
   var entries = await readAllEntries();
 
   for (var key in entries.keys) {
     if (key != strAppKey && key != strUserPin) {
-      var _hex = await readEntry(key) ?? '';
-      if (_hex.isNotEmpty) {
-        allKeys[key] = DigiKey.restore(_hex).publicKey.toCompressedHex();
+      var val = _appKey.decryptString(entries[key]!);
+      if (val.isNotEmpty) {
+        _keys[key] = DigiKey.restore(val).compressedPublic;
       }
     }
   }
+
+  return _keys;
+}
+
+Future<DigiKey?> getKey(String id) async {
+  final _hex = await readEntry(id);
+  return _hex == null || _hex.isEmpty ? null : DigiKey.restore(_hex);
+}
+
+void saveKey(String id, String key) {
+  writeEntry(id, key);
+}
+
+void deleteKey(String id) {
+  if (id != strAppKey && id != strUserPin) storage.delete(key: id);
+}
+
+Future<void> clearKeys() async {
+  final _appKey = await getAppKey();
+  final _userPin = await getUserPin();
+  storage.deleteAll();
+  if (_appKey != null) setAppKey(_appKey);
+  if (_userPin != null) setUserPin(_userPin);
 }
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
@@ -40,7 +66,7 @@ Future<void> setAppKey(String value) async {
 
 void resetAppKey() => storage.delete(key: strAppKey);
 
-Future<bool> isUserPinSet() async => await readEntry(strUserPin) != null;
+Future<bool> isUserPinSet() async => await storage.containsKey(key: strUserPin);
 
 void setUserPin(String value) {
   writeEntry(strUserPin, value);

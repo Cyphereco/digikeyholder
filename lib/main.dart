@@ -23,9 +23,6 @@ void main() async {
   // restore user pin
   userPin = await getUserPin() ?? '';
 
-  // restore saved keys
-  await loadKeys();
-
   // if appkey entry existed, restore it, otherwise, create a new one
   if (_appKey == null) {
     await setAppKey(DigiKey().toString());
@@ -47,7 +44,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: appName,
+      title: txtAppName,
       debugShowCheckedModeBanner: false,
       theme: normal(),
       darkTheme: dark(),
@@ -77,6 +74,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _useBioAuth = false;
+  Map<String, String> _keyMap = {};
+
+  Future<void> updateKeyMap() async {
+    final all = await getAllKeys();
+    setState(() {
+      _keyMap = all;
+    });
+  }
+
+  @override
+  void initState() {
+    authMe(context, didUnlocked: () => updateKeyMap(), canCancel: false);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,13 +102,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                        builder: (context) => const AddKey() //SignMessage(),
-                        ));
+                        builder: (context) => AddKey(
+                              keyMap: _keyMap,
+                            ) //SignMessage(),
+                        )).whenComplete(() => updateKeyMap());
               },
               icon: const Icon(Icons.add)),
           IconButton(
               tooltip: 'Clear Key List',
-              onPressed: () => authMe(context, didUnlocked: _deleteAllKeys),
+              onPressed: () =>
+                  authMe(context, didUnlocked: _deleteAllKeys, canCancel: true),
               icon: const Icon(Icons.delete_forever)),
           PopupMenuButton<Options>(
               icon: const Icon(Icons.extension),
@@ -153,14 +167,14 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Expanded(
                 child: ListView.builder(
-                    itemCount: allKeys.length,
+                    itemCount: _keyMap.length,
                     itemBuilder: (BuildContext context, int index) => ListTile(
                           onTap: () {
                             // show QR code of public key
                             logger.i(
                                 'show QR code of pubkey, and pubkey format options');
-                            _showPublicKey(allKeys.entries.toList()[index].key,
-                                allKeys.entries.toList()[index].value);
+                            _showPublicKey(_keyMap.entries.toList()[index].key,
+                                _keyMap.entries.toList()[index].value);
                           },
                           trailing: PopupMenuButton(
                               tooltip: 'Actions',
@@ -174,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             child: Text(keyActionText[e.name]!),
                                           ))
                                       .toList()),
-                          title: Text(allKeys.entries.toList()[index].key),
+                          title: Text(_keyMap.entries.toList()[index].key),
                           subtitle: Row(children: [
                             Transform.rotate(
                                 angle: 0.5 * pi,
@@ -184,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 )),
                             Expanded(
                                 child:
-                                    Text(allKeys.entries.toList()[index].value))
+                                    Text(_keyMap.entries.toList()[index].value))
                           ]),
                         )))
           ],
@@ -203,10 +217,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final result = await showDialog<bool>(
         context: context, builder: (context) => DeleteConfirmationDialog(''));
     if (result ?? false) {
-      // clearKeys();
-      setState(() async {
-        await loadKeys();
-      });
+      await clearKeys();
+      updateKeyMap();
     }
   }
 
@@ -229,21 +241,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _doFunc(KeyActions op, int index) async {
-    var keySel = allKeys.entries.toList()[index];
+    var keySel = _keyMap.entries.toList()[index];
     logger.i('$op: ${keySel.key}');
 
     switch (op) {
       case KeyActions.delete:
-        final result = await showDialog<bool>(
-            context: context,
-            builder: (context) => DeleteConfirmationDialog(keySel.key));
-        if (result ?? false) {
-          logger.i('Delete Key [${keySel.key}]');
-          // deleteKey(keySel.key);
-          setState(() async {
-            await loadKeys();
-          });
-        }
+        authMe(context, didUnlocked: () async {
+          final result = await showDialog<bool>(
+              context: context,
+              builder: (context) => DeleteConfirmationDialog(keySel.key));
+          if (result ?? false) {
+            logger.i('Delete Key [${keySel.key}]');
+            deleteKey(keySel.key);
+            updateKeyMap();
+          }
+        }, canCancel: true);
         break;
       case KeyActions.rename:
         final result = await showDialog<String>(
@@ -251,12 +263,10 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context) => ChangeKeyIdDialog(keySel.key));
         if ((result ?? keySel.key) != keySel.key) {
           logger.i('Change Key ID from [${keySel.key}] to [$result]');
-          // var old = await getKey(keySel.key);
-          // deleteKey(keySel.key);
-          // saveKey(result!, old.privatekey.toHex());
-          setState(() async {
-            await loadKeys();
-          });
+          var old = await getKey(keySel.key);
+          deleteKey(keySel.key);
+          saveKey(result!, old.toString());
+          updateKeyMap();
         }
         break;
       case KeyActions.derive:
@@ -265,11 +275,12 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.push(
             context,
             MaterialPageRoute<void>(
-              builder: (context) => SignMessage(keySel.key),
+              builder: (context) => SignMessage(
+                selectedKey: keySel.key,
+                keyMap: _keyMap,
+              ),
             )).then((value) {
-          setState(() async {
-            await loadKeys();
-          });
+          updateKeyMap();
         });
         break;
       case KeyActions.encdec:

@@ -1,11 +1,13 @@
-import 'package:flutter/services.dart';
+import 'package:digikeyholder/models/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:digikeyholder/services/storage.dart';
+import 'package:digikeyholder/models/digikey.dart';
+import 'package:digikeyholder/services/copytoclipboard.dart';
 
-// ignore: must_be_immutable
 class SignMessage extends StatefulWidget {
-  String _sel;
-  SignMessage(this._sel, {Key? key}) : super(key: key);
+  final String selectedKey;
+  const SignMessage({Key? key, required this.selectedKey, required this.keyMap})
+      : super(key: key);
+  final Map<String, String> keyMap;
 
   @override
   _SignMessageState createState() => _SignMessageState();
@@ -17,10 +19,12 @@ class _SignMessageState extends State<SignMessage> {
   final _signatureController = TextEditingController(text: '');
   final _msgHash = TextEditingController(text: '');
   final SizedBox _linePadding = const SizedBox(height: 12);
+  late String _selKeyId;
 
   @override
   void initState() {
-    _pubkey.text = allKeys[widget._sel]!;
+    _selKeyId = widget.selectedKey;
+    _pubkey.text = widget.keyMap[widget.selectedKey]!;
     super.initState();
   }
 
@@ -39,7 +43,8 @@ class _SignMessageState extends State<SignMessage> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  // _msgHash.text = hashMsgSha256(value);
+                  _msgHash.text = value.isEmpty ? value : hashMsgSha256(value);
+                  _signatureController.text = '';
                 });
               },
               controller: _message,
@@ -78,15 +83,15 @@ class _SignMessageState extends State<SignMessage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: DropdownButton<String>(
-                value: widget._sel,
+                value: _selKeyId,
                 isExpanded: true,
                 onChanged: (String? newValue) {
                   setState(() {
-                    widget._sel = newValue!;
-                    _pubkey.text = allKeys[widget._sel]!;
+                    _selKeyId = newValue!;
+                    _pubkey.text = widget.keyMap[widget.selectedKey]!;
                   });
                 },
-                items: allKeys.keys
+                items: widget.keyMap.keys
                     .map((e) =>
                         DropdownMenuItem<String>(value: e, child: Text(e)))
                     .toList()),
@@ -95,35 +100,24 @@ class _SignMessageState extends State<SignMessage> {
           TextButton(
               onPressed: _msgHash.text.isEmpty
                   ? null
-                  : () {
-                      setState(() {
-                        // _signatureController.text =
-                        //     DigiKey.restore(allKeys[widget._sel]!)
-                        //         .sign(_message.text);
-                      });
-                    },
+                  : () => setState(() {
+                        _signatureController.text =
+                            DigiKey.restore(widget.keyMap[widget.selectedKey]!)
+                                .sign(_message.text);
+                      }),
               child: const Text('Sign')),
           Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
               child: TextField(
-                onTap: (() {
-                  if (_signatureController.text.isEmpty) return;
-                  Clipboard.setData(
-                      ClipboardData(text: _signatureController.text));
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Signature copied.'),
-                    // backgroundColor: Colors.green,
-                    duration: Duration(seconds: 4),
-                  ));
-                }),
+                onTap: () => copyToClipboardWithNotify(
+                    context, _signatureController.text, txtSignature),
                 controller: _signatureController,
                 readOnly: true,
                 minLines: 1,
                 maxLines: 8,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), label: Text('Signature')),
+                    border: OutlineInputBorder(), label: Text(txtSignature)),
               )),
         ]),
       ),
