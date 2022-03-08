@@ -70,6 +70,11 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                       case PubKeyFormat.b32raw:
                         _pubKey.text = base32RfcEncode(hexDecode(_key.toHex()));
                         break;
+                      case PubKeyFormat.btcp2pkh:
+                        _pubKey.text =
+                            deriveBtcLegacyAddr(_key.toCompressedHex());
+                        // TODO: need to validate the address correctness
+                        break;
                       default:
                     }
                   });

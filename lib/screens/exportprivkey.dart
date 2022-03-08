@@ -60,7 +60,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                         _privKey.text = _key.toString();
                         break;
                       case PrivateKeyFormat.wif:
-                        // TODO: show wif format private key
+                        _privKey.text = deriveWif(_key.toString());
                         break;
                       case PrivateKeyFormat.b32:
                         _privKey.text =

@@ -38,6 +38,7 @@ enum PubKeyFormat {
   raw,
   b32comp,
   b32raw,
+  btcp2pkh,
 }
 
 const pubKeyFormatText = {
@@ -45,12 +46,17 @@ const pubKeyFormatText = {
   'raw': 'Raw',
   'b32comp': 'Base32 Encoded (Compressed)',
   'b32raw': 'Base32 Encoded (Raw)',
+  'btcp2pkh': 'BTC P2PKH Address',
 };
 
-enum PrivateKeyFormat { raw, wif, b32 }
+enum PrivateKeyFormat {
+  raw,
+  b32,
+  wif,
+}
 
 const privKeyFormatText = {
   'raw': 'Raw',
-  'wif': 'Wallet Import Format',
   'b32': 'Base32 Encoded',
+  'wif': 'Wallet Import Format',
 };

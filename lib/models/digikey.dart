@@ -7,6 +7,7 @@ import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:ecdsa/ecdsa.dart';
 import 'package:encryptor/encryptor.dart';
+import 'package:dart_crypto/dart_crypto.dart';
 
 var s256 = getS256();
 
@@ -99,3 +100,7 @@ String hashMsgSha256(String data) =>
 
 bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
     verify(key, msgHash, Signature.fromDERHex(sig));
+
+String deriveWif(String priv) => base58CheckEncode(hexDecode('80$priv'));
+
+String deriveBtcLegacyAddr(String pubkey) => Crypto.p2pkh(pubkey);

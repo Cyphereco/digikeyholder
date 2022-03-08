@@ -148,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     // TODO: add signature validator
                     break;
                   case Options.bioauth:
-                    // TODO: enable authentication
+                    // TODO: enable biometric authentication
                     break;
                   case Options.changepin:
                     authMe(context, didUnlocked: () async {
