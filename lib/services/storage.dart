@@ -75,7 +75,7 @@ void setUserPin(String value) {
 
 Future<String?> getUserPin() async => await readEntry(strUserPin);
 
-void resetUserPin() => deleteEntry(strUserPin);
+Future<void> resetUserPin() async => await deleteEntry(strUserPin);
 
 Future<bool> isUserPinMatched(String value) async =>
     await readEntry(strUserPin) == value;

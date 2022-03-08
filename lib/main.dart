@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:digikeyholder/screens/exportprivkey.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'theme/style.dart';
@@ -72,7 +73,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _useBioAuth = false;
   Map<String, String> _keyMap = {};
 
@@ -84,9 +85,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && await isUserPinSet()) {
+      authMe(context,
+          didConfirmed: () => updateKeyMap(),
+          didUnlocked: () => updateKeyMap(),
+          canCancel: false);
+    }
+  }
+
+  @override
   void initState() {
-    authMe(context, didUnlocked: () => updateKeyMap(), canCancel: false);
     super.initState();
+    authMe(context,
+        didConfirmed: () => updateKeyMap(),
+        didUnlocked: () => updateKeyMap(),
+        canCancel: false);
+    WidgetsBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -119,10 +140,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onSelected: (Options action) {
                 switch (action) {
                   case Options.about:
-                    // TODO: show app info
-                    authMe(context, didUnlocked: () {
-                      logger.i('Auth Success');
-                    });
+                    showDialog<bool>(
+                        context: context,
+                        builder: (context) => const AppInfoDialog());
                     break;
                   case Options.sigveri:
                     // TODO: add signature validator
@@ -131,7 +151,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     // TODO: enable authentication
                     break;
                   case Options.changepin:
-                    // TODO: Handle this case.
+                    authMe(context, didUnlocked: () async {
+                      await resetUserPin();
+                      authMe(context,
+                          didConfirmed: () => updateKeyMap(),
+                          didUnlocked: () => updateKeyMap());
+                    }, canCancel: true);
                     break;
                 }
               },
@@ -170,11 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     itemCount: _keyMap.length,
                     itemBuilder: (BuildContext context, int index) => ListTile(
                           onTap: () {
-                            // show QR code of public key
-                            logger.i(
-                                'show QR code of pubkey, and pubkey format options');
-                            _showPublicKey(_keyMap.entries.toList()[index].key,
-                                _keyMap.entries.toList()[index].value);
+                            _showKey(
+                                id: _keyMap.entries.toList()[index].key,
+                                key: _keyMap.entries.toList()[index].value);
                           },
                           trailing: PopupMenuButton(
                               tooltip: 'Actions',
@@ -222,21 +245,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _doOptions(Options op) async {
-    switch (op) {
-      case Options.bioauth:
-        break;
-      case Options.sigveri:
-        break;
-      default:
-    }
-  }
-
-  Future<void> _showPublicKey(String id, String pubkey) async {
+  Future<void> _showKey(
+      {required String id, required String key, bool isPrivate = false}) async {
+    if (key.isEmpty && !isPrivate) return;
     Navigator.push(
         context,
         MaterialPageRoute<void>(
-          builder: (context) => ShowPublicKey(id, pubkey),
+          builder: (context) =>
+              isPrivate ? ExportPrivateKey(id, key) : ShowPublicKey(id, key),
         ));
   }
 
@@ -270,6 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         break;
       case KeyActions.derive:
+        // TODO: derive key
         break;
       case KeyActions.sign:
         Navigator.push(
@@ -284,6 +301,17 @@ class _MyHomePageState extends State<MyHomePage> {
         });
         break;
       case KeyActions.encdec:
+        // TODO: message encrypt/decrypt
+        break;
+      case KeyActions.export:
+        authMe(context, canCancel: true, didUnlocked: () async {
+          var _key = await readEntry(_keyMap.entries.toList()[index].key) ?? '';
+          if (_key.isEmpty) return;
+          _showKey(
+              id: _keyMap.entries.toList()[index].key,
+              key: _key,
+              isPrivate: true);
+        });
         break;
       default:
     }

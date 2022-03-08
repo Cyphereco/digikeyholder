@@ -46,3 +46,11 @@ const pubKeyFormatText = {
   'b32comp': 'Base32 Encoded (Compressed)',
   'b32raw': 'Base32 Encoded (Raw)',
 };
+
+enum PrivateKeyFormat { raw, wif, b32 }
+
+const privKeyFormatText = {
+  'raw': 'Raw',
+  'wif': 'Wallet Import Format',
+  'b32': 'Base32 Encoded',
+};

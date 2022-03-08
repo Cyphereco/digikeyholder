@@ -2,30 +2,29 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/constants.dart';
 import 'package:digikeyholder/models/digikey.dart';
-import 'package:elliptic/elliptic.dart';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
 
-class ShowPublicKey extends StatefulWidget {
-  const ShowPublicKey(this._id, this._pubkey, {Key? key}) : super(key: key);
+class ExportPrivateKey extends StatefulWidget {
+  const ExportPrivateKey(this._id, this._pubkey, {Key? key}) : super(key: key);
 
   final String _id;
   final String _pubkey;
 
   @override
-  State<ShowPublicKey> createState() => _ShowPublicKeyState();
+  State<ExportPrivateKey> createState() => _ExportPrivateKeyState();
 }
 
-class _ShowPublicKeyState extends State<ShowPublicKey> {
-  PubKeyFormat _format = PubKeyFormat.compressed;
-  late TextEditingController _pubKey;
-  late final PublicKey _key;
+class _ExportPrivateKeyState extends State<ExportPrivateKey> {
+  PrivateKeyFormat _format = PrivateKeyFormat.raw;
+  late TextEditingController _privKey;
+  late final DigiKey _key;
 
   @override
   void initState() {
-    _pubKey = TextEditingController(text: widget._pubkey);
-    _key = hexToPublicKey(_pubKey.text);
+    _privKey = TextEditingController(text: widget._pubkey);
+    _key = DigiKey.restore(_privKey.text);
     super.initState();
   }
 
@@ -50,33 +49,30 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
           padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 20),
           child: Column(children: [
             const Text('Key Format:'),
-            DropdownButton<PubKeyFormat>(
+            DropdownButton<PrivateKeyFormat>(
                 value: _format,
                 isExpanded: true,
-                onChanged: (PubKeyFormat? newValue) {
+                onChanged: (PrivateKeyFormat? newValue) {
                   setState(() {
                     _format = newValue!;
                     switch (_format) {
-                      case PubKeyFormat.compressed:
-                        _pubKey.text = _key.toCompressedHex();
+                      case PrivateKeyFormat.raw:
+                        _privKey.text = _key.toString();
                         break;
-                      case PubKeyFormat.raw:
-                        _pubKey.text = _key.toHex();
+                      case PrivateKeyFormat.wif:
+                        // TODO: show wif format private key
                         break;
-                      case PubKeyFormat.b32comp:
-                        _pubKey.text =
-                            base32RfcEncode(hexDecode(_key.toCompressedHex()));
-                        break;
-                      case PubKeyFormat.b32raw:
-                        _pubKey.text = base32RfcEncode(hexDecode(_key.toHex()));
+                      case PrivateKeyFormat.b32:
+                        _privKey.text =
+                            base32RfcEncode(hexDecode(_key.toString()));
                         break;
                       default:
                     }
                   });
                 },
-                items: PubKeyFormat.values
-                    .map((e) => DropdownMenuItem<PubKeyFormat>(
-                        value: e, child: Text(pubKeyFormatText[e.name]!)))
+                items: PrivateKeyFormat.values
+                    .map((e) => DropdownMenuItem<PrivateKeyFormat>(
+                        value: e, child: Text(privKeyFormatText[e.name]!)))
                     .toList()),
             Container(
               padding: const EdgeInsets.all(15.0),
@@ -86,9 +82,9 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   color: Colors.white,
                   elevation: 10.0,
                   child: QrImage(
-                    data: _pubKey.text,
+                    data: _privKey.text,
                     size: 180,
-                    backgroundColor: Colors.greenAccent,
+                    backgroundColor: Colors.pink,
                   )),
             ),
             Flexible(
@@ -98,11 +94,11 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   maxLines: 6,
                   decoration:
                       const InputDecoration(border: OutlineInputBorder()),
-                  controller: _pubKey,
+                  controller: _privKey,
                   readOnly: true,
                   onTap: () {
-                    copyToClipboardWithNotify(context, _pubKey.text,
-                        '${pubKeyFormatText[_format.name]} Publc Key');
+                    copyToClipboardWithNotify(context, _privKey.text,
+                        '${privKeyFormatText[_format.name]} Publc Key');
                   },
                 )),
             TextButton(

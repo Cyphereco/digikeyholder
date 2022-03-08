@@ -73,3 +73,37 @@ class ChangeKeyIdDialog extends StatelessWidget {
     );
   }
 }
+
+class AppInfoDialog extends StatelessWidget {
+  const AppInfoDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('About'),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Version :  0.0.1',
+            textAlign: TextAlign.center,
+          ),
+          const Divider(),
+          const Text('Source code:'),
+          TextField(
+            readOnly: true,
+            // TODO: replace with real source code link
+            controller: TextEditingController(
+                text: 'https://github/cyphereco/digikeyholder'),
+          )
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK')),
+      ],
+    );
+  }
+}
