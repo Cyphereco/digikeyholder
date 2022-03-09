@@ -7,10 +7,10 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
 
 class ExportPrivateKey extends StatefulWidget {
-  const ExportPrivateKey(this._id, this._pubkey, {Key? key}) : super(key: key);
+  const ExportPrivateKey(this._id, this._privkey, {Key? key}) : super(key: key);
 
   final String _id;
-  final String _pubkey;
+  final String _privkey;
 
   @override
   State<ExportPrivateKey> createState() => _ExportPrivateKeyState();
@@ -19,12 +19,10 @@ class ExportPrivateKey extends StatefulWidget {
 class _ExportPrivateKeyState extends State<ExportPrivateKey> {
   PrivateKeyFormat _format = PrivateKeyFormat.raw;
   late TextEditingController _privKey;
-  late final DigiKey _key;
 
   @override
   void initState() {
-    _privKey = TextEditingController(text: widget._pubkey);
-    _key = DigiKey.restore(_privKey.text);
+    _privKey = TextEditingController(text: widget._privkey);
     super.initState();
   }
 
@@ -57,14 +55,14 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                     _format = newValue!;
                     switch (_format) {
                       case PrivateKeyFormat.raw:
-                        _privKey.text = _key.toString();
+                        _privKey.text = widget._privkey;
                         break;
                       case PrivateKeyFormat.wif:
-                        _privKey.text = deriveWif(_key.toString());
+                        _privKey.text = deriveWif(widget._privkey);
                         break;
                       case PrivateKeyFormat.b32:
                         _privKey.text =
-                            base32RfcEncode(hexDecode(_key.toString()));
+                            base32RfcEncode(hexDecode(widget._privkey));
                         break;
                       default:
                     }

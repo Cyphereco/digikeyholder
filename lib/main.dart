@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:digikeyholder/screens/encdec.dart';
 import 'package:digikeyholder/screens/exportprivkey.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -298,22 +299,30 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             MaterialPageRoute<void>(
               builder: (context) => SignMessage(
                 selectedKey: keySel.key,
-                keyMap: _keyMap,
+                pubkey: keySel.value,
               ),
             )).then((value) {
           updateKeyMap();
         });
         break;
       case KeyActions.encdec:
-        // TODO: message encrypt/decrypt
+        Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (context) => EncryptDecrypt(
+                selectedKey: keySel.key,
+              ),
+            )).then((value) {
+          updateKeyMap();
+        });
         break;
       case KeyActions.export:
         authMe(context, canCancel: true, didUnlocked: () async {
-          var _key = await readEntry(_keyMap.entries.toList()[index].key) ?? '';
-          if (_key.isEmpty) return;
+          var _key = await getKey(_keyMap.entries.toList()[index].key);
+          if (_key == null) return;
           _showKey(
               id: _keyMap.entries.toList()[index].key,
-              key: _key,
+              key: _key.toString(),
               isPrivate: true);
         });
         break;

@@ -12,7 +12,7 @@ enum KeyActions {
 
 const keyActionText = {
   'sign': 'Sign Message',
-  'encdec': 'En/De-cryption',
+  'encdec': 'En/Decryption',
   'derive': 'Derive Key',
   'export': 'Export',
   'rename': 'Change ID',
