@@ -96,9 +96,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
+  void updatePreference() {
+    setState(() async {
+      _useBioAuth = await getBioAuthSwitch() == 'on' ? true : false;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    updatePreference();
     authMe(context,
         didConfirmed: () => updateKeyMap(),
         didUnlocked: () => updateKeyMap(),
