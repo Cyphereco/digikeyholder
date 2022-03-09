@@ -22,13 +22,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.2"
-  base58check:
-    dependency: transitive
-    description:
-      name: base58check
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   base_codecs:
     dependency: "direct main"
     description:
@@ -36,13 +29,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
-  bip39:
-    dependency: transitive
-    description:
-      name: bip39
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.6"
   boolean_selector:
     dependency: transitive
     description:
@@ -99,13 +85,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
-  dart_crypto:
-    dependency: "direct main"
-    description:
-      name: dart_crypto
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   ecdsa:
     dependency: "direct main"
     description:
@@ -212,13 +191,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  hex:
-    dependency: transitive
-    description:
-      name: hex
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   js:
     dependency: transitive
     description:
@@ -303,13 +275,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
-  secp256k1:
-    dependency: transitive
-    description:
-      name: secp256k1
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   sky_engine:
     dependency: transitive
     description: flutter
