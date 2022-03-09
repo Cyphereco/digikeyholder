@@ -7,7 +7,7 @@ import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:ecdsa/ecdsa.dart';
 import 'package:encryptor/encryptor.dart';
-import 'package:dart_crypto/dart_crypto.dart';
+import 'package:pointycastle/digests/ripemd160.dart';
 
 var s256 = getS256();
 
@@ -101,6 +101,14 @@ String hashMsgSha256(String data) =>
 bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
     verify(key, msgHash, Signature.fromDERHex(sig));
 
-String deriveWif(String priv) => base58CheckEncode(hexDecode('80$priv'));
+String deriveWif(String priv) => base58CheckEncode(hexDecode('80${priv}01'));
 
-String deriveBtcLegacyAddr(String pubkey) => Crypto.p2pkh(pubkey);
+String deriveBtcLegacyAddr(String pubkey) {
+  var sha256hash = sha256.convert(hexDecode(pubkey)).bytes;
+  var ripemd160digest =
+      RIPEMD160Digest().process(Uint8List.fromList(sha256hash));
+  Uint8List raw = Uint8List(ripemd160digest.length + 1);
+  raw.setRange(0, 0, [0]); // add version prefix, 0x00 for mainnet
+  raw.setRange(1, raw.length, ripemd160digest);
+  return base58CheckEncode(raw);
+}
