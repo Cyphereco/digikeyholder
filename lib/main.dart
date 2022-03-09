@@ -151,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   case Options.bioAuthControl:
                     setState(() {
                       _useBioAuth = !_useBioAuth;
+                      setBioAuthSwitch(_useBioAuth ? 'on' : 'off');
                     });
                     break;
                   case Options.changePin:
