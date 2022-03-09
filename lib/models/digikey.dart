@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:crypto/crypto.dart';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:ecdsa/ecdsa.dart';
 import 'package:encryptor/encryptor.dart';
 import 'package:pointycastle/digests/ripemd160.dart';
+import 'package:pointycastle/digests/sha256.dart';
 
 var s256 = getS256();
 
@@ -96,7 +96,7 @@ String _randomValue(int length) {
 }
 
 String hashMsgSha256(String data) =>
-    sha256.convert(utf8.encode(data)).toString();
+    hexEncode(SHA256Digest().process(Uint8List.fromList(utf8.encode(data))));
 
 bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
     verify(key, msgHash, Signature.fromDERHex(sig));
@@ -104,7 +104,8 @@ bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
 String deriveWif(String priv) => base58CheckEncode(hexDecode('80${priv}01'));
 
 String deriveBtcLegacyAddr(String pubkey) {
-  var sha256hash = sha256.convert(hexDecode(pubkey)).bytes;
+  var sha256hash =
+      SHA256Digest().process(Uint8List.fromList(hexDecode(pubkey)));
   var ripemd160digest =
       RIPEMD160Digest().process(Uint8List.fromList(sha256hash));
   Uint8List raw = Uint8List(ripemd160digest.length + 1);

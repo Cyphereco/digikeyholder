@@ -1,4 +1,5 @@
 import 'package:digikeyholder/models/constants.dart';
+import 'package:digikeyholder/screens/authme.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
@@ -101,9 +102,12 @@ class _SignMessageState extends State<SignMessage> {
               onPressed: _msgHash.text.isEmpty
                   ? null
                   : () => setState(() {
-                        _signatureController.text =
-                            DigiKey.restore(widget.keyMap[widget.selectedKey]!)
-                                .sign(_message.text);
+                        authMe(context,
+                            canCancel: true,
+                            didUnlocked: () => _signatureController.text =
+                                DigiKey.restore(
+                                        widget.keyMap[widget.selectedKey]!)
+                                    .sign(_message.text));
                       }),
               child: const Text('Sign')),
           Padding(
