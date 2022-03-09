@@ -42,6 +42,7 @@ dependencies:
   qr_flutter: ^4.0.0
   logger: ^1.1.0
   ecdsa: ^0.0.4
+  local_auth: ^1.1.11
 
 dev_dependencies:
   flutter_test:

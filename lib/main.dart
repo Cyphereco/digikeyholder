@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:digikeyholder/screens/exportprivkey.dart';
 import 'package:flutter/material.dart';
@@ -148,21 +149,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     // TODO: add signature validator
                     break;
                   case Options.bioAuthControl:
-                    // TODO: enable biometric authentication
+                    setState(() {
+                      _useBioAuth = !_useBioAuth;
+                    });
                     break;
                   case Options.changePin:
-                    authMe(context, didUnlocked: () async {
-                      await resetUserPin();
-                      authMe(context,
-                          didConfirmed: () => updateKeyMap(),
-                          didUnlocked: () => updateKeyMap());
-                    }, canCancel: true);
+                    authMe(context, resetPin: true, canCancel: true);
                     break;
                 }
               },
               itemBuilder: (BuildContext context) => Options.values
+                  .where((e) => ((Platform.isIOS || Platform.isAndroid) ||
+                      e.name != Options.bioAuthControl.name))
                   .map((e) => PopupMenuItem<Options>(
-                        child: e.name != 'bioauth'
+                        child: e.name != Options.bioAuthControl.name
                             ? Text(optionsText[e.name]!)
                             : StatefulBuilder(
                                 builder: (BuildContext context,
@@ -172,10 +172,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                         Expanded(
                                             child: Text(optionsText[e.name]!)),
                                         Switch(
+                                          key: const Key('switchBioAuth'),
                                           value: _useBioAuth,
                                           onChanged: (isOn) {
                                             setState(() {
                                               _useBioAuth = isOn;
+                                              setBioAuthSwitch(
+                                                  isOn ? 'on' : 'off');
                                             });
                                           },
                                         ),

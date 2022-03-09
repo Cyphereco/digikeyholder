@@ -6,6 +6,7 @@ const storage = FlutterSecureStorage();
 
 const strAppKey = 'appKey';
 const strUserPin = 'userPin';
+const strBioAuthSwitch = 'bioAuthSwitch';
 
 String userPin = '';
 
@@ -19,7 +20,7 @@ Future<Map<String, String>> getAllKeys() async {
   var entries = await readAllEntries();
 
   for (var key in entries.keys) {
-    if (key != strAppKey && key != strUserPin) {
+    if (key != strAppKey && key != strUserPin && key != strBioAuthSwitch) {
       var val = _appKey.decryptString(entries[key]!);
       if (val.isNotEmpty) {
         _keys[key] = DigiKey.restore(val).compressedPublic;
@@ -40,7 +41,8 @@ void saveKey(String id, String key) {
 }
 
 void deleteKey(String id) {
-  if (id != strAppKey && id != strUserPin) storage.delete(key: id);
+  if (id != strAppKey && id != strUserPin && id != strBioAuthSwitch)
+    storage.delete(key: id);
 }
 
 Future<void> clearKeys() async {
@@ -50,6 +52,13 @@ Future<void> clearKeys() async {
   if (_appKey != null) setAppKey(_appKey);
   if (_userPin != null) setUserPin(_userPin);
 }
+
+void setBioAuthSwitch(String onOff) async {
+  await storage.write(key: strBioAuthSwitch, value: onOff);
+}
+
+Future<String> getBioAuthSwitch() async =>
+    await storage.read(key: strBioAuthSwitch) ?? 'off';
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 
