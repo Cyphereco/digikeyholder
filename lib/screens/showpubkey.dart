@@ -73,7 +73,6 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                       case PubKeyFormat.btcp2pkh:
                         _pubKey.text =
                             deriveBtcLegacyAddr(_key.toCompressedHex());
-                        // TODO: need to validate the address correctness
                         break;
                       default:
                     }
