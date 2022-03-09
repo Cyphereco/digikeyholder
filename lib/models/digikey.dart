@@ -96,7 +96,8 @@ String _randomValue(int length) {
 }
 
 String hashMsgSha256(String data) =>
-    hexEncode(SHA256Digest().process(Uint8List.fromList(utf8.encode(data))));
+    hexEncode(SHA256Digest().process(Uint8List.fromList(utf8.encode(data))))
+        .toLowerCase();
 
 bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
     verify(key, msgHash, Signature.fromDERHex(sig));

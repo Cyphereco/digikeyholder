@@ -75,6 +75,14 @@ void main() {
     expect(m == n, true);
   });
 
+  test('SHA256 digest on text validation', () {
+    const msg = 'hello';
+    const hash =
+        '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824';
+
+    expect(hashMsgSha256(msg) == hash, true);
+  });
+
   test('DigiKey ECDH computeShareKey validation', () {
     final m = DigiKey();
     final n = DigiKey();
@@ -127,5 +135,21 @@ void main() {
 
     // match calculated publicKey with derived publicKey
     expect(p == d.publicKey, true);
+  });
+
+  test('Derive WIF valition', () {
+    const priv =
+        '5373bc51f2bb0675d799798213b9afb9361cf8f82e188894bd52591d836ec59b';
+    const wif = 'Kz1vwcRLRGj4FL7gBkxPcoTzx7C6pxDFzkqdkyGsqmGS3gx2DgSo';
+
+    expect(deriveWif(priv) == wif, true);
+  });
+
+  test('Derive BTC P2PKH address validation', () {
+    const pubkey =
+        '03fb1531988d0e576db4773e68bbf72b272d8d2bbad02ad84f2ce93ec31a393ad0';
+    const addr = '15eCyMKFNJMuzLXmK1QXCpUaSiCCLpwQpM';
+
+    expect(deriveBtcLegacyAddr(pubkey) == addr, true);
   });
 }

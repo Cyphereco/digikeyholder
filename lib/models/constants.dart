@@ -20,16 +20,16 @@ const keyActionText = {
 };
 
 enum Options {
-  sigveri,
-  changepin,
-  bioauth,
+  sigValidator,
+  changePin,
+  bioAuthControl,
   about,
 }
 
 const optionsText = {
-  'sigveri': 'Signature Validator',
-  'changepin': 'Change PIN',
-  'bioauth': 'Biometrics Authentication',
+  'sigValidator': 'Signature Validator',
+  'changePin': 'Change PIN',
+  'bioAuthControl': 'Biometrics Authentication',
   'about': 'About'
 };
 

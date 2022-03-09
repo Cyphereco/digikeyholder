@@ -30,7 +30,7 @@ void main() async {
   }
 
   // === User PIN validation ===
-  logger.i('isUserPinSet: ${await isUserPinSet()}');
+  // logger.i('isUserPinSet: ${await isUserPinSet()}');
   // if (!await isUserPinSet()) setUserPin('1234');
   // logger.i('isUserPinMatched(5678): ${await isUserPinMatched('5678')}');
   // logger.i('isUserPinMatched(1234): ${await isUserPinMatched('1234')}');
@@ -144,13 +144,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         context: context,
                         builder: (context) => const AppInfoDialog());
                     break;
-                  case Options.sigveri:
+                  case Options.sigValidator:
                     // TODO: add signature validator
                     break;
-                  case Options.bioauth:
+                  case Options.bioAuthControl:
                     // TODO: enable biometric authentication
                     break;
-                  case Options.changepin:
+                  case Options.changePin:
                     authMe(context, didUnlocked: () async {
                       await resetUserPin();
                       authMe(context,
@@ -258,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<void> _doFunc(KeyActions op, int index) async {
     var keySel = _keyMap.entries.toList()[index];
-    logger.i('$op: ${keySel.key}');
+    // logger.i('$op: ${keySel.key}');
 
     switch (op) {
       case KeyActions.delete:
@@ -267,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               context: context,
               builder: (context) => DeleteConfirmationDialog(keySel.key));
           if (result ?? false) {
-            logger.i('Delete Key [${keySel.key}]');
+            // logger.i('Delete Key [${keySel.key}]');
             deleteKey(keySel.key);
             updateKeyMap();
           }
@@ -278,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             context: context,
             builder: (context) => ChangeKeyIdDialog(keySel.key));
         if ((result ?? keySel.key) != keySel.key) {
-          logger.i('Change Key ID from [${keySel.key}] to [$result]');
+          // logger.i('Change Key ID from [${keySel.key}] to [$result]');
           var old = await getKey(keySel.key);
           deleteKey(keySel.key);
           saveKey(result!, old.toString());
