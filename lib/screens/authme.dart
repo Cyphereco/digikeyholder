@@ -13,7 +13,6 @@ Future<void> authMe(BuildContext context,
     bool resetPin = false,
     Function? didUnlocked,
     Function? didConfirmed}) async {
-  print(_authenticating);
   if (_authenticating) return;
   _authenticating = true;
 

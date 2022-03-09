@@ -41,8 +41,9 @@ void saveKey(String id, String key) {
 }
 
 void deleteKey(String id) {
-  if (id != strAppKey && id != strUserPin && id != strBioAuthSwitch)
+  if (id != strAppKey && id != strUserPin && id != strBioAuthSwitch) {
     storage.delete(key: id);
+  }
 }
 
 Future<void> clearKeys() async {
