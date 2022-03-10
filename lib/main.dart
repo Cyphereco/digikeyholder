@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:digikeyholder/screens/encdec.dart';
 import 'package:digikeyholder/screens/exportprivkey.dart';
+import 'package:digikeyholder/screens/sigvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'theme/style.dart';
@@ -96,9 +97,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
-  void updatePreference() {
-    setState(() async {
-      _useBioAuth = await getBioAuthSwitch() == 'on' ? true : false;
+  void updatePreference() async {
+    var _isSwitchOn = await getBioAuthSwitch();
+    setState(() {
+      _useBioAuth = _isSwitchOn == 'on' ? true : false;
     });
   }
 
@@ -154,7 +156,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         builder: (context) => const AppInfoDialog());
                     break;
                   case Options.sigValidator:
-                    // TODO: add signature validator
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => const SigValidator(),
+                        ));
                     break;
                   case Options.bioAuthControl:
                     setState(() {
