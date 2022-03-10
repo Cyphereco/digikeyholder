@@ -42,11 +42,21 @@ class DigiKey {
             .toRadixString(16));
   }
 
-  String encryptString(String m, [PublicKey? p]) => Encryptor.encrypt(
-      p == null || p == _k.publicKey ? _k.toHex() : computeShareKey(p), m);
+  String encryptString(String m, [String p = '']) => Encryptor.encrypt(
+      p.isEmpty ||
+              p == _k.publicKey.toCompressedHex() ||
+              p == _k.publicKey.toHex()
+          ? _k.toHex()
+          : computeShareKey(PublicKey.fromHex(s256, p)),
+      m);
 
-  String decryptString(String c, [PublicKey? p]) => Encryptor.decrypt(
-      p == null || p == _k.publicKey ? _k.toHex() : computeShareKey(p), c);
+  String decryptString(String c, [String p = '']) => Encryptor.decrypt(
+      p.isEmpty ||
+              p == _k.publicKey.toCompressedHex() ||
+              p == _k.publicKey.toHex()
+          ? _k.toHex()
+          : computeShareKey(PublicKey.fromHex(s256, p)),
+      c);
 
   bool verify({required String data, required String sig}) =>
       signatueVerify(publicKey, _toHash(data), sig);

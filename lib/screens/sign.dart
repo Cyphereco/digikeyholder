@@ -15,10 +15,11 @@ class SignMessage extends StatefulWidget {
   _SignMessageState createState() => _SignMessageState();
 }
 
+// TODO: add QR code scanner for message and public key input
 class _SignMessageState extends State<SignMessage> {
   final _message = TextEditingController(text: '');
   final _pubkey = TextEditingController(text: '');
-  final _signatureController = TextEditingController(text: '');
+  final _signature = TextEditingController(text: '');
   final _msgHash = TextEditingController(text: '');
   late String _selKeyId;
 
@@ -46,7 +47,7 @@ class _SignMessageState extends State<SignMessage> {
               onChanged: (value) {
                 setState(() {
                   _msgHash.text = value.isEmpty ? value : hashMsgSha256(value);
-                  _signatureController.text = '';
+                  _signature.text = '';
                 });
               },
               controller: _message,
@@ -64,8 +65,9 @@ class _SignMessageState extends State<SignMessage> {
               minLines: 1,
               maxLines: 10,
               readOnly: true,
-              decoration:
-                  const InputDecoration(label: Text('Message Digest (SHA256)')),
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  label: Text('Message Digest (SHA256)')),
             ),
           ),
           Padding(
@@ -77,7 +79,8 @@ class _SignMessageState extends State<SignMessage> {
               minLines: 1,
               maxLines: 10,
               maxLength: 66,
-              decoration: InputDecoration(label: Text(_strSignerTitle)),
+              decoration: InputDecoration(
+                  border: InputBorder.none, label: Text(_strSignerTitle)),
             ),
           ),
           TextButton(
@@ -86,7 +89,7 @@ class _SignMessageState extends State<SignMessage> {
                   : () => setState(() {
                         authMe(context,
                             canCancel: true,
-                            didUnlocked: () async => _signatureController.text =
+                            didUnlocked: () async => _signature.text =
                                 (await getKey(widget.selectedKey))!
                                     .sign(_message.text));
                       }),
@@ -96,8 +99,8 @@ class _SignMessageState extends State<SignMessage> {
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
               child: TextField(
                 onTap: () => copyToClipboardWithNotify(
-                    context, _signatureController.text, txtSignature),
-                controller: _signatureController,
+                    context, _signature.text, txtSignature),
+                controller: _signature,
                 readOnly: true,
                 minLines: 1,
                 maxLines: 8,

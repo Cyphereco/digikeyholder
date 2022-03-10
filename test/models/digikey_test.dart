@@ -106,16 +106,16 @@ void main() {
     final n = DigiKey();
     const msg = 'Test Plain Text';
 
-    final cipherM = m.encryptString(msg, n.publicKey);
+    final cipherM = m.encryptString(msg, n.publicKey.toString());
     expect(cipherM != msg, true);
 
-    final cipherN = n.encryptString(msg, m.publicKey);
+    final cipherN = n.encryptString(msg, m.publicKey.toString());
     expect(cipherM == cipherN, true);
 
-    final decipherM = n.decryptString(cipherM, m.publicKey);
+    final decipherM = n.decryptString(cipherM, m.publicKey.toString());
     expect(decipherM == msg, true);
 
-    final decipherN = m.decryptString(cipherN, n.publicKey);
+    final decipherN = m.decryptString(cipherN, n.publicKey.toString());
     expect(decipherM == decipherN, true);
   });
 

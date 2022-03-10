@@ -30,8 +30,8 @@ Future<void> authMe(BuildContext context,
     );
     if (didAuthenticate) {
       if (didUnlocked != null) didUnlocked();
-    } else {
-      if (!canCancel) exit(0);
+    } else if (!canCancel) {
+      exit(0);
     }
     _authenticating = false;
   } else {

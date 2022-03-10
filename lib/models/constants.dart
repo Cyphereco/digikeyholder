@@ -1,5 +1,6 @@
 const txtAppName = 'DigiKey Holder';
 const txtSignature = 'Signature';
+const txtCipherMsg = 'Ciphered message';
 
 enum KeyActions {
   sign,

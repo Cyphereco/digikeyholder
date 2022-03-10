@@ -90,12 +90,12 @@ class AppInfoDialog extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const Divider(),
-          const Text('Source code:'),
+          const Text('License: MIT'),
           TextField(
             readOnly: true,
-            // TODO: replace with real source code link
             controller: TextEditingController(
-                text: 'https://github/cyphereco/digikeyholder'),
+                text: 'github.com/cyphereco/digikeyholder'),
+            decoration: const InputDecoration(border: InputBorder.none),
           )
         ],
       ),

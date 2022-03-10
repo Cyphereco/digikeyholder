@@ -11,6 +11,7 @@ class AddKey extends StatefulWidget {
   State<AddKey> createState() => _AddKeyState();
 }
 
+// TODO: add QR code scan to read import key
 class _AddKeyState extends State<AddKey> {
   final TextEditingController _id = TextEditingController(text: '');
   final TextEditingController _privateKey = TextEditingController(text: '');
