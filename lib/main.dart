@@ -90,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           didUnlocked: () => updateKeyMap(),
           canCancel: false);
     } else {
+      Navigator.popUntil(context, (route) => route.isFirst);
       setState(() {
         _keyMap = {};
       });
@@ -225,6 +226,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.yellow,
         onPressed: () {
           Navigator.push(
               context,

@@ -10,13 +10,12 @@ ThemeData normal() => ThemeData(
       // or simply save your changes to "hot reload" in a Flutter IDE).
       // Notice that the counter didn't reset back to zero; the application
       // is not restarted.
-      primarySwatch: Colors.blue,
+      primarySwatch: Colors.yellow,
       // scaffoldBackgroundColor: Colors.yellowAccent,
     );
 
 ThemeData dark() => ThemeData(
-      brightness: Brightness.dark,
+      // brightness: Brightness.dark,
       /* dark theme settings */
-      primarySwatch: Colors.yellow,
-      scaffoldBackgroundColor: Colors.blueGrey,
+      colorScheme: const ColorScheme.dark(primary: Colors.yellow),
     );
