@@ -49,9 +49,11 @@ void deleteKey(String id) {
 Future<void> clearKeys() async {
   final _appKey = await getAppKey();
   final _userPin = await getUserPin();
+  final _bioAuthSwitch = await getBioAuthSwitch();
   storage.deleteAll();
   if (_appKey != null) setAppKey(_appKey);
   if (_userPin != null) setUserPin(_userPin);
+  if (_bioAuthSwitch != null) setBioAuthSwitch(_bioAuthSwitch);
 }
 
 void setBioAuthSwitch(String onOff) async {
