@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
@@ -7,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
 import 'package:digikeyholder/services/snackbarnotification.dart';
+import 'package:pointycastle/digests/ripemd160.dart';
+
+import 'dialogs.dart';
 
 class EncryptDecrypt extends StatefulWidget {
   final String selectedKey;
@@ -20,13 +25,18 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
   final _input = TextEditingController(text: '');
   final _otherPubkey = TextEditingController(text: '');
   final _output = TextEditingController(text: '');
-  final _msgHash = TextEditingController(text: '');
 
   static const _strEnc = 'Encrypt';
   static const _strDec = 'Decrypt';
   static const _strPlainText = 'Plain Text Message';
   static const _strCipherMsg = 'Ciphered Message';
   late String _act;
+
+  var cipherMsg = {
+    CipheredMessageField.cipher.name: '',
+    CipheredMessageField.publickey.name: '',
+    CipheredMessageField.secrethash.name: '',
+  };
 
   @override
   void initState() {
@@ -45,13 +55,31 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                 ? null
                 : [
                     IconButton(
-                        tooltip: 'Show signature QR code',
+                        tooltip: 'Copy ciphered message',
                         onPressed: () {
-                          // TODO: implement encrypt message QR code
+                          copyToClipboardWithNotify(context,
+                              jsonEncode(cipherMsg), 'Ciphered message');
+                        },
+                        icon: const Icon(Icons.copy)),
+                    IconButton(
+                        tooltip: 'Show QR code',
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => QrDataDialog(
+                                    title: 'Ciphered Message',
+                                    data: jsonEncode(cipherMsg),
+                                  ));
                         },
                         icon: const Icon(Icons.qr_code)),
                   ])
             : [
+                IconButton(
+                    tooltip: 'Paste input from clipboard',
+                    onPressed: () {
+                      // TODO: implement read encrypt message QR scanner
+                    },
+                    icon: const Icon(Icons.paste)),
                 IconButton(
                     tooltip: 'Scan QR code',
                     onPressed: () {
@@ -70,8 +98,9 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                 onChanged: (act) {
                   setState(() {
                     _act = act!;
-                    _input.text = '';
-                    _output.text = '';
+                    cipherMsg[CipheredMessageField.cipher.name] = '';
+                    cipherMsg[CipheredMessageField.publickey.name] = '';
+                    cipherMsg[CipheredMessageField.secrethash.name] = '';
                   });
                 },
                 items: const [
@@ -110,8 +139,10 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  _msgHash.text = value.isEmpty ? value : hashMsgSha256(value);
                   _output.text = '';
+                  cipherMsg[CipheredMessageField.cipher.name] = '';
+                  cipherMsg[CipheredMessageField.publickey.name] = '';
+                  cipherMsg[CipheredMessageField.secrethash.name] = '';
                 });
               },
               controller: _input,
@@ -123,7 +154,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
             ),
           ),
           TextButton(
-              onPressed: _msgHash.text.isEmpty
+              onPressed: _input.text.isEmpty
                   ? null
                   : () => setState(() {
                         if (_otherPubkey.text.isNotEmpty) {
@@ -143,6 +174,28 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                               setState(() {
                                 _output.text = _key.encryptString(
                                     _input.text, _otherPubkey.text);
+                                cipherMsg[CipheredMessageField.cipher.name] =
+                                    _output.text;
+                                cipherMsg[CipheredMessageField.publickey.name] =
+                                    _otherPubkey.text.isEmpty
+                                        ? publicKeyAdd(_key.publicKey,
+                                                    _key.publicKey)
+                                                ?.toCompressedHex() ??
+                                            ''
+                                        : publicKeyAdd(
+                                                    _key.publicKey,
+                                                    hexToPublicKey(
+                                                        _otherPubkey.text))
+                                                ?.toCompressedHex() ??
+                                            '';
+                                cipherMsg[
+                                        CipheredMessageField.secrethash.name] =
+                                    hexEncode(RIPEMD160Digest().process(
+                                        hexDecode(_otherPubkey.text.isEmpty
+                                            ? _key.toString()
+                                            : _key.computeShareKey(
+                                                hexToPublicKey(
+                                                    _otherPubkey.text)))));
                               });
                             } else {
                               try {
@@ -177,5 +230,9 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
         ]),
       ),
     );
+  }
+
+  String exportToJson(String cipher, String pubkey, String hash) {
+    return jsonEncode(cipherMsg);
   }
 }

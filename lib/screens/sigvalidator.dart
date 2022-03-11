@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
+import 'package:digikeyholder/screens/scanner.dart';
 import 'package:digikeyholder/services/snackbarnotification.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
@@ -20,6 +21,22 @@ class _SigValidatorState extends State<SigValidator> {
   final _signature = TextEditingController(text: '');
   final _msgHash = TextEditingController(text: '');
 
+  void _parseImportData(String data) {
+    try {
+      var json = jsonDecode(data);
+
+      setState(() {
+        _message.text = json[SingedMessageField.message.name] ?? '';
+        _msgHash.text =
+            _message.text.isEmpty ? '' : hashMsgSha256(_message.text);
+        _pubkey.text = json[SingedMessageField.publickey.name] ?? '';
+        _signature.text = json[SingedMessageField.signature.name] ?? '';
+      });
+    } catch (e) {
+      snackbarAlert(context, message: 'Invalid content!');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const _strSignerTitle = 'Signer\'s public key:';
@@ -35,31 +52,21 @@ class _SigValidatorState extends State<SigValidator> {
                     const ClipboardData(text: '');
 
                 if (data.text!.isNotEmpty) {
-                  try {
-                    var json = jsonDecode(data.text!);
-
-                    setState(() {
-                      _message.text =
-                          json[SingedMessageField.message.name] ?? '';
-                      _msgHash.text = _message.text.isEmpty
-                          ? ''
-                          : hashMsgSha256(_message.text);
-                      _pubkey.text =
-                          json[SingedMessageField.publickey.name] ?? '';
-                      _signature.text =
-                          json[SingedMessageField.signature.name] ?? '';
-                    });
-                  } catch (e) {
-                    snackbarAlert(context, message: 'Invalid content!');
-                  }
+                  _parseImportData(data.text!);
                 }
               },
               icon: const Icon(Icons.paste)),
           IconButton(
               tooltip: 'Scan QR code',
               onPressed: () {
-                // TODO: implement read signed message QR scanner
-                // print(scanQR());
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<String?>(
+                        builder: (context) => QrScanner())).then((value) {
+                  if (value != null && value.isNotEmpty) {
+                    _parseImportData(value);
+                  }
+                });
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(

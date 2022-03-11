@@ -59,7 +59,7 @@ class _SignMessageState extends State<SignMessage> {
                     tooltip: 'Copy signed message',
                     onPressed: () {
                       copyToClipboardWithNotify(
-                          context, toJson(), 'Singed message');
+                          context, exportToJson(), 'Singed message');
                     },
                     icon: const Icon(Icons.copy_all)),
                 IconButton(
@@ -69,7 +69,7 @@ class _SignMessageState extends State<SignMessage> {
                           context: context,
                           builder: (context) => QrDataDialog(
                                 title: 'Signed Message',
-                                data: toJson(),
+                                data: exportToJson(),
                               ));
                     },
                     icon: const Icon(Icons.qr_code)),
@@ -152,13 +152,13 @@ class _SignMessageState extends State<SignMessage> {
     );
   }
 
-  String toJson() {
-    var out = {
+  String exportToJson() {
+    var signedMsg = {
       SingedMessageField.message.name: _message.text,
       SingedMessageField.publickey.name: _pubkey.text,
       SingedMessageField.signature.name: _signature.text,
     };
 
-    return jsonEncode(out);
+    return jsonEncode(signedMsg);
   }
 }

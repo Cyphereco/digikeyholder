@@ -98,6 +98,17 @@ PublicKey? publicKeyMul(PublicKey p, List<int> mul) {
   }
 }
 
+PublicKey? publicKeyAdd(PublicKey p, PublicKey q) {
+  final r = s256.add(p, q);
+  return s256.isOnCurve(r) ? PublicKey.fromPoint(s256, r) : null;
+}
+
+PublicKey? publicKeySubstract(PublicKey p, PublicKey q) {
+  final negQ = AffinePoint.fromXY(q.X, -q.Y);
+  final r = s256.add(p, negQ);
+  return s256.isOnCurve(r) ? PublicKey.fromPoint(s256, r) : null;
+}
+
 PublicKey hexToPublicKey(String hex) {
   return PublicKey.fromHex(s256, hex);
 }

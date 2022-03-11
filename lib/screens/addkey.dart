@@ -1,3 +1,5 @@
+import 'package:base_codecs/base_codecs.dart';
+import 'package:digikeyholder/screens/scanner.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
@@ -28,7 +30,24 @@ class _AddKeyState extends State<AddKey> {
           IconButton(
               tooltip: 'Scan QR code',
               onPressed: () {
-                // TODO: implement private key QR scanner
+                Navigator.push(
+                    context,
+                    MaterialPageRoute<String?>(
+                        builder: (context) => QrScanner())).then((value) {
+                  if (value != null && value.length <= 64) {
+                    try {
+                      var _priv = hexEncode(hexDecode(value));
+                      setState(() {
+                        _privateKey.text = _priv;
+                        _publicKey.text =
+                            DigiKey.restore(_priv).publicKey.toCompressedHex();
+                        return;
+                      });
+                    } catch (e) {
+                      snackbarAlert(context, message: 'No valid data founded.');
+                    }
+                  }
+                });
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(

@@ -56,6 +56,17 @@ void main() {
     // and validate publickey.X is the same as shareKey
     var o = PrivateKey.fromHex(s256, (scalarMN % s256.n).toRadixString(16));
     expect(sk == o.publicKey.X.toRadixString(16), true);
+
+    // Add two AffintePoint (m+n)=t, expect (t+(-m))=n and (t+(-n))=m
+    final s = s256.add(m.publicKey, n.publicKey);
+    final t = PublicKey.fromPoint(
+        s256, AffinePoint.fromXY(m.publicKey.X, -(m.publicKey.Y)));
+    final u = PublicKey.fromPoint(
+        s256, AffinePoint.fromXY(n.publicKey.X, -(n.publicKey.Y)));
+    final v = PublicKey.fromPoint(s256, s256.add(s, t));
+    final w = PublicKey.fromPoint(s256, s256.add(s, u));
+    expect(v == n.publicKey, true);
+    expect(w == m.publicKey, true);
   });
 
   test('DigiKey generate random key validation', () {

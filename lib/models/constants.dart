@@ -3,6 +3,7 @@ const txtSignature = 'Signature';
 const txtCipherMsg = 'Ciphered message';
 
 enum SingedMessageField { message, publickey, signature }
+enum CipheredMessageField { cipher, publickey, secrethash }
 
 enum KeyActions {
   sign,
