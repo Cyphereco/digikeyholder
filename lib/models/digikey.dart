@@ -43,19 +43,11 @@ class DigiKey {
   }
 
   String encryptString(String m, [String p = '']) => Encryptor.encrypt(
-      p.isEmpty ||
-              p == _k.publicKey.toCompressedHex() ||
-              p == _k.publicKey.toHex()
-          ? _k.toHex()
-          : computeShareKey(PublicKey.fromHex(s256, p)),
+      !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
       m);
 
   String decryptString(String c, [String p = '']) => Encryptor.decrypt(
-      p.isEmpty ||
-              p == _k.publicKey.toCompressedHex() ||
-              p == _k.publicKey.toHex()
-          ? _k.toHex()
-          : computeShareKey(PublicKey.fromHex(s256, p)),
+      !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
       c);
 
   bool verify({required String data, required String sig}) =>
@@ -89,10 +81,26 @@ class DigiKey {
   int get hashCode => Object.hash(_k, publicKey);
 }
 
-PublicKey? publicKeyMul(PublicKey p, List<int> mul) =>
-    PublicKey.fromPoint(s256, s256.scalarMul(p, mul));
+bool isValidPublicKey(String p) {
+  try {
+    PublicKey.fromHex(s256, p);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
-PublicKey hexToPublicKey(String hex) => PublicKey.fromHex(s256, hex);
+PublicKey? publicKeyMul(PublicKey p, List<int> mul) {
+  try {
+    return PublicKey.fromPoint(s256, s256.scalarMul(p, mul));
+  } catch (e) {
+    return null;
+  }
+}
+
+PublicKey hexToPublicKey(String hex) {
+  return PublicKey.fromHex(s256, hex);
+}
 
 String randomID() => _randomValue(3) + '-' + _randomValue(3);
 
@@ -105,12 +113,23 @@ String _randomValue(int length) {
   return String.fromCharCodes(codeUnits);
 }
 
-String hashMsgSha256(String data) =>
-    hexEncode(SHA256Digest().process(Uint8List.fromList(utf8.encode(data))))
+String hashMsgSha256(String data) {
+  try {
+    return hexEncode(
+            SHA256Digest().process(Uint8List.fromList(utf8.encode(data))))
         .toLowerCase();
+  } catch (e) {
+    return '';
+  }
+}
 
-bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) =>
-    verify(key, msgHash, Signature.fromDERHex(sig));
+bool signatueVerify(PublicKey key, Uint8List msgHash, String sig) {
+  try {
+    return verify(key, msgHash, Signature.fromDERHex(sig));
+  } catch (e) {
+    return false;
+  }
+}
 
 String deriveWif(String priv) => base58CheckEncode(hexDecode('80${priv}01'));
 

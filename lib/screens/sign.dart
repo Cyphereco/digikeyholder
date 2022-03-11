@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:digikeyholder/models/constants.dart';
 import 'package:digikeyholder/screens/authme.dart';
+import 'package:digikeyholder/screens/dialogs.dart';
 import 'package:digikeyholder/services/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
@@ -15,13 +18,23 @@ class SignMessage extends StatefulWidget {
   _SignMessageState createState() => _SignMessageState();
 }
 
-// TODO: add QR code scanner for message and public key input
 class _SignMessageState extends State<SignMessage> {
   final _message = TextEditingController(text: '');
   final _pubkey = TextEditingController(text: '');
   final _signature = TextEditingController(text: '');
   final _msgHash = TextEditingController(text: '');
   late String _selKeyId;
+
+  Widget resetInput() => IconButton(
+      tooltip: 'Reset input',
+      onPressed: () {
+        setState(() {
+          _message.text = '';
+          _msgHash.text = '';
+          _signature.text = '';
+        });
+      },
+      icon: const Icon(Icons.replay));
 
   @override
   void initState() {
@@ -37,6 +50,31 @@ class _SignMessageState extends State<SignMessage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Sign Message'),
+        actions: _signature.text.isEmpty
+            ? [
+                resetInput(),
+              ]
+            : [
+                IconButton(
+                    tooltip: 'Copy signed message',
+                    onPressed: () {
+                      copyToClipboardWithNotify(
+                          context, toJson(), 'Singed message');
+                    },
+                    icon: const Icon(Icons.copy_all)),
+                IconButton(
+                    tooltip: 'Show QR code',
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => QrDataDialog(
+                                title: 'Signed Message',
+                                data: toJson(),
+                              ));
+                    },
+                    icon: const Icon(Icons.qr_code)),
+                resetInput(),
+              ],
       ),
       body: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -87,11 +125,13 @@ class _SignMessageState extends State<SignMessage> {
               onPressed: _msgHash.text.isEmpty
                   ? null
                   : () => setState(() {
-                        authMe(context,
-                            canCancel: true,
-                            didUnlocked: () async => _signature.text =
-                                (await getKey(widget.selectedKey))!
-                                    .sign(_message.text));
+                        authMe(context, canCancel: true, didUnlocked: () async {
+                          var _sig = (await getKey(widget.selectedKey))!
+                              .sign(_message.text);
+                          setState(() {
+                            _signature.text = _sig;
+                          });
+                        });
                       }),
               child: const Text('Sign')),
           Padding(
@@ -110,5 +150,15 @@ class _SignMessageState extends State<SignMessage> {
         ]),
       ),
     );
+  }
+
+  String toJson() {
+    var out = {
+      SingedMessageField.message.name: _message.text,
+      SingedMessageField.publickey.name: _pubkey.text,
+      SingedMessageField.signature.name: _signature.text,
+    };
+
+    return jsonEncode(out);
   }
 }

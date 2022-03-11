@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/storage.dart';
+import 'package:digikeyholder/services/snackbarnotification.dart';
 
 class AddKey extends StatefulWidget {
   const AddKey({required this.keyMap, Key? key}) : super(key: key);
@@ -11,7 +12,6 @@ class AddKey extends StatefulWidget {
   State<AddKey> createState() => _AddKeyState();
 }
 
-// TODO: add QR code scan to read import key
 class _AddKeyState extends State<AddKey> {
   final TextEditingController _id = TextEditingController(text: '');
   final TextEditingController _privateKey = TextEditingController(text: '');
@@ -25,6 +25,12 @@ class _AddKeyState extends State<AddKey> {
       appBar: AppBar(
         title: const Text('Add Key'),
         actions: [
+          IconButton(
+              tooltip: 'Scan QR code',
+              onPressed: () {
+                // TODO: implement private key QR scanner
+              },
+              icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
               tooltip: 'Generate',
               onPressed: () {
@@ -120,12 +126,7 @@ class _AddKeyState extends State<AddKey> {
       }
 
       if (msg.isNotEmpty) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(msg),
-          // backgroundColor: Colors.green,
-          duration: const Duration(seconds: 4),
-        ));
+        snackbarAlert(context, message: msg);
         return;
       }
 

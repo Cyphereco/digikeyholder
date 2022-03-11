@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
-import 'package:elliptic/elliptic.dart';
+import 'package:digikeyholder/services/snackbarnotification.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +14,6 @@ class SigValidator extends StatefulWidget {
   _SigValidatorState createState() => _SigValidatorState();
 }
 
-// TODO: add QR code scanner for message and public key input
 class _SigValidatorState extends State<SigValidator> {
   final _message = TextEditingController(text: '');
   final _pubkey = TextEditingController(text: '');
@@ -26,6 +27,53 @@ class _SigValidatorState extends State<SigValidator> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Validate Signature'),
+        actions: [
+          IconButton(
+              tooltip: 'Paste content from clipboard',
+              onPressed: () async {
+                var data = await Clipboard.getData('text/plain') ??
+                    const ClipboardData(text: '');
+
+                if (data.text!.isNotEmpty) {
+                  try {
+                    var json = jsonDecode(data.text!);
+
+                    setState(() {
+                      _message.text =
+                          json[SingedMessageField.message.name] ?? '';
+                      _msgHash.text = _message.text.isEmpty
+                          ? ''
+                          : hashMsgSha256(_message.text);
+                      _pubkey.text =
+                          json[SingedMessageField.publickey.name] ?? '';
+                      _signature.text =
+                          json[SingedMessageField.signature.name] ?? '';
+                    });
+                  } catch (e) {
+                    snackbarAlert(context, message: 'Invalid content!');
+                  }
+                }
+              },
+              icon: const Icon(Icons.paste)),
+          IconButton(
+              tooltip: 'Scan QR code',
+              onPressed: () {
+                // TODO: implement read signed message QR scanner
+                // print(scanQR());
+              },
+              icon: const Icon(Icons.qr_code_scanner_outlined)),
+          IconButton(
+              tooltip: 'Reset input',
+              onPressed: () {
+                setState(() {
+                  _message.text = '';
+                  _msgHash.text = '';
+                  _pubkey.text = '';
+                  _signature.text = '';
+                });
+              },
+              icon: const Icon(Icons.replay)),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -43,12 +91,12 @@ class _SigValidatorState extends State<SigValidator> {
               maxLines: 10,
               autofocus: true,
               decoration:
-                  const InputDecoration(label: Text('Message to be signed')),
+                  const InputDecoration(label: Text('Original Message')),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),
-            child: Text('Digest: ' + _msgHash.text),
+            child: Text('Digest (SHA256): ' + _msgHash.text),
           ),
           Padding(
             padding:
@@ -60,7 +108,7 @@ class _SigValidatorState extends State<SigValidator> {
               ],
               controller: _pubkey,
               maxLines: 1,
-              maxLength: 66,
+              maxLength: 130,
               decoration: const InputDecoration(label: Text(_strSignerTitle)),
             ),
           ),
@@ -86,15 +134,11 @@ class _SigValidatorState extends State<SigValidator> {
                   ? null
                   : () {
                       try {
-                        PublicKey.fromHex(s256, _pubkey.text);
+                        hexToPublicKey(_pubkey.text);
                       } catch (e) {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text('Invalid public key!'),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 4),
-                        ));
+                        snackbarAlert(context,
+                            message: 'Invalid public key!',
+                            backgroundColor: Colors.red);
                         setState(() {
                           _pubkey.clear();
                         });
@@ -103,21 +147,16 @@ class _SigValidatorState extends State<SigValidator> {
 
                       var isValid = false;
                       try {
-                        isValid = signatueVerify(
-                            PublicKey.fromHex(s256, _pubkey.text),
-                            hexDecode(_msgHash.text),
-                            _signature.text);
+                        isValid = signatueVerify(hexToPublicKey(_pubkey.text),
+                            hexDecode(_msgHash.text), _signature.text);
                       } catch (e) {
                         isValid = false;
                       }
-
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            isValid ? 'Valid signature' : 'Invalid signature!'),
-                        backgroundColor: isValid ? Colors.green : Colors.red,
-                        duration: const Duration(seconds: 4),
-                      ));
+                      snackbarAlert(context,
+                          message: isValid
+                              ? 'Valid signature'
+                              : 'Invalid signature!',
+                          backgroundColor: isValid ? Colors.green : Colors.red);
                     },
               child: const Text('Validate')),
         ]),

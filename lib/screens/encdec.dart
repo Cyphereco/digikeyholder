@@ -3,10 +3,10 @@ import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
 import 'package:digikeyholder/screens/authme.dart';
 import 'package:digikeyholder/services/storage.dart';
-import 'package:elliptic/elliptic.dart';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
+import 'package:digikeyholder/services/snackbarnotification.dart';
 
 class EncryptDecrypt extends StatefulWidget {
   final String selectedKey;
@@ -16,7 +16,6 @@ class EncryptDecrypt extends StatefulWidget {
   _EncryptDecryptState createState() => _EncryptDecryptState();
 }
 
-// TODO: add QR code generator and scanner for input/output
 class _EncryptDecryptState extends State<EncryptDecrypt> {
   final _input = TextEditingController(text: '');
   final _otherPubkey = TextEditingController(text: '');
@@ -41,6 +40,25 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Message En/Decrypt'),
+        actions: _act == _strEnc
+            ? (_output.text.isEmpty
+                ? null
+                : [
+                    IconButton(
+                        tooltip: 'Show signature QR code',
+                        onPressed: () {
+                          // TODO: implement encrypt message QR code
+                        },
+                        icon: const Icon(Icons.qr_code)),
+                  ])
+            : [
+                IconButton(
+                    tooltip: 'Scan QR code',
+                    onPressed: () {
+                      // TODO: implement read encrypt message QR scanner
+                    },
+                    icon: const Icon(Icons.qr_code_scanner_outlined)),
+              ],
       ),
       body: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -75,13 +93,12 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                     hexDecode(_otherPubkey.text);
                   } catch (e) {
                     _otherPubkey.clear();
-                    _showPubkeyError();
                   }
                 });
               },
               controller: _otherPubkey,
               maxLines: 1,
-              maxLength: 66,
+              maxLength: 130,
               decoration: InputDecoration(
                   label: Text(
                       '${_act == _strEnc ? 'Recipient' : 'Sender'}\'s Public Key')),
@@ -111,9 +128,11 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                   : () => setState(() {
                         if (_otherPubkey.text.isNotEmpty) {
                           try {
-                            PublicKey.fromHex(s256, _otherPubkey.text);
+                            hexToPublicKey(_otherPubkey.text);
                           } catch (e) {
-                            _showPubkeyError();
+                            snackbarAlert(context,
+                                message: 'Invalid public key!',
+                                backgroundColor: Colors.red);
                             return;
                           }
                         }
@@ -121,12 +140,16 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                           var _key = await getKey(widget.selectedKey);
                           if (_key != null) {
                             if (_act == _strEnc) {
-                              _output.text = _key.encryptString(
-                                  _input.text, _otherPubkey.text);
+                              setState(() {
+                                _output.text = _key.encryptString(
+                                    _input.text, _otherPubkey.text);
+                              });
                             } else {
                               try {
-                                _output.text = _key.decryptString(
-                                    _input.text, _otherPubkey.text);
+                                setState(() {
+                                  _output.text = _key.decryptString(
+                                      _input.text, _otherPubkey.text);
+                                });
                               } catch (e) {
                                 _output.text =
                                     'Input [ ${_input.text} ] is not a valid ciphered message or the used key or sender\'s public key is incorrect!';
@@ -154,14 +177,5 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
         ]),
       ),
     );
-  }
-
-  _showPubkeyError() {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Invalid public key!'),
-      backgroundColor: Colors.red,
-      duration: Duration(seconds: 4),
-    ));
   }
 }

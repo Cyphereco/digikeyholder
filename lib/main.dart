@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:digikeyholder/screens/encdec.dart';
-import 'package:digikeyholder/screens/exportprivkey.dart';
 import 'package:digikeyholder/screens/sigvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -12,11 +10,11 @@ import 'models/digikey.dart';
 import 'screens/addkey.dart';
 import 'screens/authme.dart';
 import 'screens/showpubkey.dart';
-import 'screens/sign.dart';
 import 'screens/dialogs.dart';
 
 var logger = Logger();
 
+// TODO: support multi-language
 void main() async {
   // Make sure widget initialized before using storage
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,13 +29,6 @@ void main() async {
   if (_appKey == null) {
     await setAppKey(DigiKey().toString());
   }
-
-  // === User PIN validation ===
-  // logger.i('isUserPinSet: ${await isUserPinSet()}');
-  // if (!await isUserPinSet()) setUserPin('1234');
-  // logger.i('isUserPinMatched(5678): ${await isUserPinMatched('5678')}');
-  // logger.i('isUserPinMatched(1234): ${await isUserPinMatched('1234')}');
-  // resetUserPin();
 
   runApp(const Home());
 }
@@ -82,8 +73,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future<void> updateKeyMap() async {
     final all = await getAllKeys();
+    var _list = all.entries.toList();
+    _list.sort(
+      (a, b) => a.key.compareTo(b.key),
+    );
     setState(() {
-      _keyMap = all;
+      _keyMap = Map.fromEntries(_list);
     });
   }
 
@@ -94,6 +89,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           didConfirmed: () => updateKeyMap(),
           didUnlocked: () => updateKeyMap(),
           canCancel: false);
+    } else {
+      setState(() {
+        _keyMap = {};
+      });
     }
   }
 
@@ -129,19 +128,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         title: Text(widget.title),
         actions: [
           IconButton(
-              tooltip: 'Add Key',
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                        builder: (context) => AddKey(
-                              keyMap: _keyMap,
-                            ) //SignMessage(),
-                        )).whenComplete(() => updateKeyMap());
-              },
-              icon: const Icon(Icons.add)),
-          IconButton(
-              tooltip: 'Clear Key List',
+              tooltip: 'Empty key list',
               onPressed: () =>
                   authMe(context, didUnlocked: _deleteAllKeys, canCancel: true),
               icon: const Icon(Icons.delete_forever)),
@@ -213,22 +200,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     itemCount: _keyMap.length,
                     itemBuilder: (BuildContext context, int index) => ListTile(
                           onTap: () {
-                            _showKey(
-                                id: _keyMap.entries.toList()[index].key,
-                                key: _keyMap.entries.toList()[index].value);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (context) => ShowPublicKey(
+                                      _keyMap.entries.toList()[index].key,
+                                      _keyMap.entries.toList()[index].value),
+                                )).whenComplete(() => updateKeyMap());
                           },
-                          trailing: PopupMenuButton(
-                              tooltip: 'Actions',
-                              onSelected: (KeyActions op) {
-                                _doFunc(op, index);
-                              },
-                              itemBuilder: (BuildContext context) =>
-                                  KeyActions.values
-                                      .map((e) => PopupMenuItem<KeyActions>(
-                                            value: e,
-                                            child: Text(keyActionText[e.name]!),
-                                          ))
-                                      .toList()),
                           title: Text(_keyMap.entries.toList()[index].key),
                           subtitle: Row(children: [
                             Transform.rotate(
@@ -245,11 +224,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                  builder: (context) => AddKey(
+                        keyMap: _keyMap,
+                      ) //SignMessage(),
+                  )).whenComplete(() => updateKeyMap());
+        },
+        tooltip: 'Add key',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -260,86 +247,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (result ?? false) {
       await clearKeys();
       updateKeyMap();
-    }
-  }
-
-  Future<void> _showKey(
-      {required String id, required String key, bool isPrivate = false}) async {
-    if (key.isEmpty && !isPrivate) return;
-    Navigator.push(
-        context,
-        MaterialPageRoute<void>(
-          builder: (context) =>
-              isPrivate ? ExportPrivateKey(id, key) : ShowPublicKey(id, key),
-        ));
-  }
-
-  Future<void> _doFunc(KeyActions op, int index) async {
-    var keySel = _keyMap.entries.toList()[index];
-    // logger.i('$op: ${keySel.key}');
-
-    switch (op) {
-      case KeyActions.delete:
-        authMe(context, didUnlocked: () async {
-          final result = await showDialog<bool>(
-              context: context,
-              builder: (context) => DeleteConfirmationDialog(keySel.key));
-          if (result ?? false) {
-            // logger.i('Delete Key [${keySel.key}]');
-            deleteKey(keySel.key);
-            updateKeyMap();
-          }
-        }, canCancel: true);
-        break;
-      case KeyActions.rename:
-        final result = await showDialog<String>(
-            context: context,
-            builder: (context) => ChangeKeyIdDialog(keySel.key));
-        if ((result ?? keySel.key) != keySel.key) {
-          // logger.i('Change Key ID from [${keySel.key}] to [$result]');
-          var old = await getKey(keySel.key);
-          deleteKey(keySel.key);
-          saveKey(result!, old.toString());
-          updateKeyMap();
-        }
-        break;
-      case KeyActions.derive:
-        // TODO: derive key
-        break;
-      case KeyActions.sign:
-        Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (context) => SignMessage(
-                selectedKey: keySel.key,
-                pubkey: keySel.value,
-              ),
-            )).then((value) {
-          updateKeyMap();
-        });
-        break;
-      case KeyActions.encdec:
-        Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (context) => EncryptDecrypt(
-                selectedKey: keySel.key,
-              ),
-            )).then((value) {
-          updateKeyMap();
-        });
-        break;
-      case KeyActions.export:
-        authMe(context, canCancel: true, didUnlocked: () async {
-          var _key = await getKey(_keyMap.entries.toList()[index].key);
-          if (_key == null) return;
-          _showKey(
-              id: _keyMap.entries.toList()[index].key,
-              key: _key.toString(),
-              isPrivate: true);
-        });
-        break;
-      default:
     }
   }
 }

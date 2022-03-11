@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class DeleteConfirmationDialog extends StatelessWidget {
   DeleteConfirmationDialog(String id, {Key? key})
@@ -14,6 +15,7 @@ class DeleteConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       title: Row(
         children: const [
           Padding(
@@ -49,6 +51,7 @@ class ChangeKeyIdDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       title: Row(
         children: const [
           Padding(
@@ -74,12 +77,62 @@ class ChangeKeyIdDialog extends StatelessWidget {
   }
 }
 
+class QrDataDialog extends StatelessWidget {
+  const QrDataDialog({Key? key, required this.title, required this.data})
+      : super(key: key);
+  final String title;
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.black87,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(
+            height: 20.0,
+          ),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 20),
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          PhysicalModel(
+              color: Colors.white,
+              elevation: 10.0,
+              child: QrImage(
+                data: data,
+                size: 180,
+              )),
+          const SizedBox(
+            height: 20.0,
+          ),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK")),
+          const SizedBox(
+            height: 20.0,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class AppInfoDialog extends StatelessWidget {
   const AppInfoDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       title: const Text('About'),
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,

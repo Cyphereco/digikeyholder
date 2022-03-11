@@ -18,7 +18,7 @@ void main() {
         '045a1b3aa77891a9d13224e7d728b95772a623d79b615c5703765e1865a2c85bdb03836a40187240ed87c7a9d65a3563ddc217862f86720d15788e9c672aef3f6b';
     const preCalcShareKey =
         '591c93295a82570e9f135e4a564b0c37be0746c840fc8e5739b3dedceaa50b10';
-    var sk = m.computeShareKey(PublicKey.fromHex(s256, otherPubHex));
+    var sk = m.computeShareKey(hexToPublicKey(otherPubHex));
 
     expect(sk == preCalcShareKey, true);
 

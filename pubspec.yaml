@@ -1,5 +1,7 @@
 name: digikeyholder
-description: A new Flutter project.
+description: Off-line SECP256K1 digital key manager.
+
+
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -43,6 +45,7 @@ dependencies:
   logger: ^1.1.0
   ecdsa: ^0.0.4
   local_auth: ^1.1.11
+  flutter_launcher_icons: ^0.9.2
 
 dev_dependencies:
   flutter_test:
@@ -96,3 +99,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  image_path: "assets/icon/1024.png" 
+  android: true
+  ios: true
+  # optionally, as transparency is not allowed on app store
+  remove_alpha_ios: true

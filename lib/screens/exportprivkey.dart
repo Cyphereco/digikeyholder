@@ -37,7 +37,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                   angle: 0.5 * pi,
                   child: const Icon(
                     Icons.key,
-                    color: Colors.grey,
+                    color: Colors.red,
                   )),
               Expanded(child: Text(widget._id)),
             ],
