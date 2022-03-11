@@ -28,11 +28,13 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
   PubKeyFormat _format = PubKeyFormat.compressed;
   late TextEditingController _pubKey;
   late final PublicKey _key;
+  late String _id;
 
   @override
   void initState() {
     _pubKey = TextEditingController(text: widget._pubkey);
     _key = hexToPublicKey(_pubKey.text);
+    _id = widget._id;
     super.initState();
   }
 
@@ -49,7 +51,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                     Icons.key,
                     color: Colors.green,
                   )),
-              Expanded(child: Text(widget._id)),
+              Expanded(child: Text(_id)),
             ],
           ),
           actions: [
@@ -142,24 +144,26 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
         authMe(context, didUnlocked: () async {
           final result = await showDialog<bool>(
               context: context,
-              builder: (context) => DeleteConfirmationDialog(widget._id));
+              builder: (context) => DeleteConfirmationDialog(_id));
           if (result ?? false) {
-            deleteKey(widget._id);
+            deleteKey(_id);
             Navigator.pop(context);
           }
         }, canCancel: true);
         break;
       case KeyActions.rename:
         final result = await showDialog<String>(
-            context: context,
-            builder: (context) => ChangeKeyIdDialog(widget._id));
-        if ((result ?? widget._id) != widget._id) {
+            context: context, builder: (context) => ChangeKeyIdDialog(_id));
+        if ((result ?? _id) != _id) {
           var _k = await getKey(result!);
 
           if (_k == null) {
-            var old = await getKey(widget._id);
-            deleteKey(widget._id);
+            var old = await getKey(_id);
+            deleteKey(_id);
             saveKey(result, old.toString());
+            setState(() {
+              _id = result;
+            });
           } else {
             snackbarAlert(context,
                 message: 'Key ID duplicated!', backgroundColor: Colors.red);
@@ -174,7 +178,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
             context,
             MaterialPageRoute<void>(
               builder: (context) => SignMessage(
-                selectedKey: widget._id,
+                selectedKey: _id,
                 pubkey: widget._pubkey,
               ),
             ));
@@ -184,19 +188,18 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
             context,
             MaterialPageRoute<void>(
               builder: (context) => EncryptDecrypt(
-                selectedKey: widget._id,
+                selectedKey: _id,
               ),
             ));
         break;
       case KeyActions.export:
         authMe(context, canCancel: true, didUnlocked: () async {
-          var _key = await getKey(widget._id);
+          var _key = await getKey(_id);
           if (_key == null) return;
           Navigator.push(
               context,
               MaterialPageRoute<void>(
-                builder: (context) =>
-                    ExportPrivateKey(widget._id, _key.toString()),
+                builder: (context) => ExportPrivateKey(_id, _key.toString()),
               ));
         });
         break;
