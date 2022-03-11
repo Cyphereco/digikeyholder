@@ -53,7 +53,7 @@ Future<void> clearKeys() async {
   storage.deleteAll();
   if (_appKey != null) setAppKey(_appKey);
   if (_userPin != null) setUserPin(_userPin);
-  if (_bioAuthSwitch != null) setBioAuthSwitch(_bioAuthSwitch);
+  setBioAuthSwitch(_bioAuthSwitch);
 }
 
 void setBioAuthSwitch(String onOff) async {
