@@ -32,11 +32,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
   static const _strCipherMsg = 'Ciphered Message';
   late String _act;
 
-  var cipherMsg = {
-    CipheredMessageField.cipher.name: '',
-    CipheredMessageField.publickey.name: '',
-    CipheredMessageField.secrethash.name: '',
-  };
+  var cipherMsg = {};
 
   @override
   void initState() {
@@ -98,9 +94,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                 onChanged: (act) {
                   setState(() {
                     _act = act!;
-                    cipherMsg[CipheredMessageField.cipher.name] = '';
-                    cipherMsg[CipheredMessageField.publickey.name] = '';
-                    cipherMsg[CipheredMessageField.secrethash.name] = '';
+                    cipherMsg = {};
                   });
                 },
                 items: const [
@@ -140,9 +134,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
               onChanged: (value) {
                 setState(() {
                   _output.text = '';
-                  cipherMsg[CipheredMessageField.cipher.name] = '';
-                  cipherMsg[CipheredMessageField.publickey.name] = '';
-                  cipherMsg[CipheredMessageField.secrethash.name] = '';
+                  cipherMsg = {};
                 });
               },
               controller: _input,
@@ -172,35 +164,15 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                           if (_key != null) {
                             if (_act == _strEnc) {
                               setState(() {
-                                _output.text = _key.encryptString(
+                                cipherMsg = _key.encryptMessage(
                                     _input.text, _otherPubkey.text);
-                                cipherMsg[CipheredMessageField.cipher.name] =
-                                    _output.text;
-                                cipherMsg[CipheredMessageField.publickey.name] =
-                                    _otherPubkey.text.isEmpty
-                                        ? publicKeyAdd(_key.publicKey,
-                                                    _key.publicKey)
-                                                ?.toCompressedHex() ??
-                                            ''
-                                        : publicKeyAdd(
-                                                    _key.publicKey,
-                                                    hexToPublicKey(
-                                                        _otherPubkey.text))
-                                                ?.toCompressedHex() ??
-                                            '';
-                                cipherMsg[
-                                        CipheredMessageField.secrethash.name] =
-                                    hexEncode(RIPEMD160Digest().process(
-                                        hexDecode(_otherPubkey.text.isEmpty
-                                            ? _key.toString()
-                                            : _key.computeShareKey(
-                                                hexToPublicKey(
-                                                    _otherPubkey.text)))));
+                                _output.text =
+                                    cipherMsg[CipheredMessageField.cipher.name];
                               });
                             } else {
                               try {
                                 setState(() {
-                                  _output.text = _key.decryptString(
+                                  _output.text = _key.decrypt(
                                       _input.text, _otherPubkey.text);
                                 });
                               } catch (e) {
@@ -230,9 +202,5 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
         ]),
       ),
     );
-  }
-
-  String exportToJson(String cipher, String pubkey, String hash) {
-    return jsonEncode(cipherMsg);
   }
 }

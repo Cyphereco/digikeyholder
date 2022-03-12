@@ -105,8 +105,8 @@ void main() {
   test('DigiKey eccrypt/decrypt using privateKey', () {
     final m = DigiKey();
     const msg = 'Test Plain Text';
-    final cipherM = m.encryptString(msg);
-    final decipherM = m.decryptString(cipherM);
+    final cipherM = m.encrypt(msg);
+    final decipherM = m.decrypt(cipherM);
 
     expect(cipherM != msg, true);
     expect(decipherM == msg, true);
@@ -117,16 +117,16 @@ void main() {
     final n = DigiKey();
     const msg = 'Test Plain Text';
 
-    final cipherM = m.encryptString(msg, n.publicKey.toString());
+    final cipherM = m.encrypt(msg, n.publicKey.toString());
     expect(cipherM != msg, true);
 
-    final cipherN = n.encryptString(msg, m.publicKey.toString());
+    final cipherN = n.encrypt(msg, m.publicKey.toString());
     expect(cipherM == cipherN, true);
 
-    final decipherM = n.decryptString(cipherM, m.publicKey.toString());
+    final decipherM = n.decrypt(cipherM, m.publicKey.toString());
     expect(decipherM == msg, true);
 
-    final decipherN = m.decryptString(cipherN, n.publicKey.toString());
+    final decipherN = m.decrypt(cipherN, n.publicKey.toString());
     expect(decipherM == decipherN, true);
   });
 

@@ -21,7 +21,7 @@ Future<Map<String, String>> getAllKeys() async {
 
   for (var key in entries.keys) {
     if (key != strAppKey && key != strUserPin && key != strBioAuthSwitch) {
-      var val = _appKey.decryptString(entries[key]!);
+      var val = _appKey.decrypt(entries[key]!);
       if (val.isNotEmpty) {
         _keys[key] = DigiKey.restore(val).compressedPublic;
       }
@@ -96,7 +96,7 @@ Future<String?> readEntry(String key) async {
   var _sk = await getAppKey();
   if (_sk != null) {
     var value = await storage.read(key: key);
-    if (value != null) return DigiKey.restore(_sk).decryptString(value);
+    if (value != null) return DigiKey.restore(_sk).decrypt(value);
   }
   return null;
 }
@@ -104,8 +104,7 @@ Future<String?> readEntry(String key) async {
 Future<void> writeEntry(String key, String value) async {
   var _sk = await getAppKey();
   if (_sk != null) {
-    await storage.write(
-        key: key, value: DigiKey.restore(_sk).encryptString(value));
+    await storage.write(key: key, value: DigiKey.restore(_sk).encrypt(value));
   }
 }
 

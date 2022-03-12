@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:base_codecs/base_codecs.dart';
+import 'package:digikeyholder/models/constants.dart';
 import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:ecdsa/ecdsa.dart';
@@ -18,9 +19,9 @@ class DigiKey {
 
   DigiKey.restore(String hex) : _k = PrivateKey.fromHex(s256, hex);
 
-  get publicKey => _k.publicKey;
+  PublicKey get publicKey => _k.publicKey;
 
-  get compressedPublic => _k.publicKey.toCompressedHex();
+  String get compressedPublic => _k.publicKey.toCompressedHex();
 
   String computeShareKey(PublicKey p) {
     String? _sk;
@@ -42,11 +43,36 @@ class DigiKey {
             .toRadixString(16));
   }
 
-  String encryptString(String m, [String p = '']) => Encryptor.encrypt(
+  String encrypt(String m, [String p = '']) => Encryptor.encrypt(
       !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
       m);
 
-  String decryptString(String c, [String p = '']) => Encryptor.decrypt(
+  Map encryptMessage(String msg, [String otherPubkey = '']) {
+    final encMsg = {};
+
+    final nonce = DigiKey();
+    encMsg[CipheredMessageField.nonce.name] = nonce.publicKey.toCompressedHex();
+
+    final _sk = !isValidPublicKey(otherPubkey)
+        ? _k.toHex()
+        : computeShareKey(hexToPublicKey(otherPubkey));
+    final secretHash = hexEncode(RIPEMD160Digest().process(hexDecode(
+        (BigInt.parse(_sk, radix: 16) + nonce.publicKey.X).toRadixString(16))));
+    encMsg[CipheredMessageField.secrethash.name] = secretHash;
+
+    final point = s256.add(
+        s256.add(publicKey, nonce.publicKey),
+        isValidPublicKey(otherPubkey)
+            ? hexToPublicKey(otherPubkey)
+            : publicKey);
+    encMsg[CipheredMessageField.publickey.name] =
+        PublicKey.fromPoint(s256, point).toCompressedHex();
+
+    encMsg[CipheredMessageField.cipher.name] = encrypt(msg, otherPubkey);
+    return encMsg;
+  }
+
+  String decrypt(String c, [String p = '']) => Encryptor.decrypt(
       !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
       c);
 
