@@ -8,6 +8,8 @@ import 'package:digikeyholder/services/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'authme.dart';
+
 class CipherDecryptor extends StatefulWidget {
   const CipherDecryptor({Key? key, required this.keyList}) : super(key: key);
   final List<String> keyList;
@@ -201,21 +203,39 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                       setState(() {
                         _output.text = '';
                       });
-                      final encMsg = {};
-                      encMsg[CipheredMessageField.cipher.name] = _cipher.text;
-                      encMsg[CipheredMessageField.nonce.name] = _nonce.text;
-                      encMsg[CipheredMessageField.publickey.name] =
-                          _pubkey.text;
-                      encMsg[CipheredMessageField.secrethash.name] =
-                          _secretHash.text;
 
-                      if (_tryAllKeys) {
-                        for (var key in widget.keyList) {
-                          setState(() {
-                            _selKey = key;
-                          });
+                      authMe(context, canCancel: true, didUnlocked: () async {
+                        final encMsg = {};
+                        encMsg[CipheredMessageField.cipher.name] = _cipher.text;
+                        encMsg[CipheredMessageField.nonce.name] = _nonce.text;
+                        encMsg[CipheredMessageField.publickey.name] =
+                            _pubkey.text;
+                        encMsg[CipheredMessageField.secrethash.name] =
+                            _secretHash.text;
+
+                        if (_tryAllKeys) {
+                          for (var key in widget.keyList) {
+                            setState(() {
+                              _selKey = key;
+                            });
+                            try {
+                              final _sk = await getKey(key);
+                              if (_sk != null) {
+                                var ret = _sk.decryptMessage(encMsg);
+                                if (ret != null && ret.isNotEmpty) {
+                                  setState(() {
+                                    _output.text = ret;
+                                  });
+                                }
+                              }
+                              // ignore: empty_catches
+                            } catch (e) {}
+
+                            if (_output.text.isNotEmpty) break;
+                          }
+                        } else {
                           try {
-                            final _sk = await getKey(key);
+                            final _sk = await getKey(_selKey);
                             if (_sk != null) {
                               var ret = _sk.decryptMessage(encMsg);
                               if (ret != null && ret.isNotEmpty) {
@@ -226,29 +246,14 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                             }
                             // ignore: empty_catches
                           } catch (e) {}
-
-                          if (_output.text.isNotEmpty) break;
                         }
-                      } else {
-                        try {
-                          final _sk = await getKey(_selKey);
-                          if (_sk != null) {
-                            var ret = _sk.decryptMessage(encMsg);
-                            if (ret != null && ret.isNotEmpty) {
-                              setState(() {
-                                _output.text = ret;
-                              });
-                            }
-                          }
-                          // ignore: empty_catches
-                        } catch (e) {}
-                      }
 
-                      if (_output.text.isEmpty) {
-                        snackbarAlert(context,
-                            message: 'Cannot decrypt cipher!',
-                            backgroundColor: Colors.red);
-                      }
+                        if (_output.text.isEmpty) {
+                          snackbarAlert(context,
+                              message: 'Cannot decrypt cipher!',
+                              backgroundColor: Colors.red);
+                        }
+                      });
                     },
               child: const Text('Decrypt')),
           Padding(

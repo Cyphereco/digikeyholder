@@ -8,7 +8,7 @@ enum CipheredMessageField { cipher, nonce, publickey, secrethash }
 enum KeyActions {
   sign,
   encrypt,
-  derive,
+  // derive,
   export,
   rename,
   delete,

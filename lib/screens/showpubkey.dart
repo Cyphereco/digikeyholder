@@ -170,9 +170,9 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
           }
         }
         break;
-      case KeyActions.derive:
-        // TODO: derive key
-        break;
+      // case KeyActions.derive:
+      //   // TODO: derive key
+      //   break;
       case KeyActions.sign:
         Navigator.push(
             context,
