@@ -1,16 +1,18 @@
 # digikeyholder
+A completely off-line SECP256K1 digital key manager application for Android, iOS, Windows, and MacOS.
 
-A new Flutter project.
+What is it for?
 
-## Getting Started
+What does it do?
+- Completely off-line application.
+- Random private key generation or import from existing private key.
+- Mandatory passcode (PIN) authentication on app open, key deletion, and using private key for signing, encrypting, decrypting, exporting, etc.
+- Presenting public key in the following formats: compressed, raw, base32 encode, and Bitcoin P2PKH (legacy) address.
+- Presenting private key when exporting in the following formats: raw, base32 encode, wallet import format (WIF).
+- Support ECDSA digital signing on message and an ECDSA signature validator.
+- Support data (text) encryption/decryption with private key or ECDH shared key.
 
-This project is a starting point for a Flutter application.
+Some tech insights,
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+From the creator,
