@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:digikeyholder/screens/cipherdecryptor.dart';
 import 'package:digikeyholder/screens/sigvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -148,6 +149,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         context,
                         MaterialPageRoute<void>(
                           builder: (context) => const SigValidator(),
+                        ));
+                    break;
+                  case Options.cipherDecryptor:
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => CipherDecryptor(
+                            keyList: _keyMap.keys.toList(),
+                          ),
                         ));
                     break;
                   case Options.bioAuthControl:

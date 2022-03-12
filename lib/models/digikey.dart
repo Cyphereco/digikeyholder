@@ -44,7 +44,9 @@ class DigiKey {
   }
 
   String encrypt(String m, [String p = '']) => Encryptor.encrypt(
-      !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
+      !isValidPublicKey(p) || hexToPublicKey(p) == publicKey
+          ? _k.toHex()
+          : computeShareKey(hexToPublicKey(p)),
       m);
 
   Map encryptMessage(String msg, [String otherPubkey = '']) {
@@ -52,8 +54,8 @@ class DigiKey {
 
     final nonce = DigiKey();
     encMsg[CipheredMessageField.nonce.name] = nonce.publicKey.toCompressedHex();
-
-    final _sk = !isValidPublicKey(otherPubkey)
+    final _sk = !isValidPublicKey(otherPubkey) ||
+            hexToPublicKey(otherPubkey) == publicKey
         ? _k.toHex()
         : computeShareKey(hexToPublicKey(otherPubkey));
     final secretHash = hexEncode(RIPEMD160Digest().process(hexDecode(
@@ -68,13 +70,43 @@ class DigiKey {
     encMsg[CipheredMessageField.publickey.name] =
         PublicKey.fromPoint(s256, point).toCompressedHex();
 
-    encMsg[CipheredMessageField.cipher.name] = encrypt(msg, otherPubkey);
+    encMsg[CipheredMessageField.cipher.name] =
+        Encryptor.encrypt(_sk + nonce.publicKey.toCompressedHex(), msg);
     return encMsg;
   }
 
-  String decrypt(String c, [String p = '']) => Encryptor.decrypt(
-      !isValidPublicKey(p) ? _k.toHex() : computeShareKey(hexToPublicKey(p)),
-      c);
+  String decrypt(String c, [String p = '']) {
+    var ret = Encryptor.decrypt(
+        !isValidPublicKey(p) || hexToPublicKey(p) == publicKey
+            ? _k.toHex()
+            : computeShareKey(hexToPublicKey(p)),
+        c);
+    return ret;
+  }
+
+  String? decryptMessage(Map encMsg, [String otherPubkey = '']) {
+    try {
+      final nonce =
+          PublicKey.fromHex(s256, encMsg[CipheredMessageField.nonce.name]);
+
+      final pubkey =
+          PublicKey.fromHex(s256, encMsg[CipheredMessageField.publickey.name]);
+      final sumPubkey = publicKeySubstract(pubkey, nonce);
+      final otherPubkey = publicKeySubstract(sumPubkey!, publicKey);
+      final _sk =
+          otherPubkey == publicKey ? _k.toHex() : computeShareKey(otherPubkey!);
+      final secretHash = hexEncode(RIPEMD160Digest().process(hexDecode(
+          (BigInt.parse(_sk, radix: 16) + nonce.X).toRadixString(16))));
+      if (encMsg[CipheredMessageField.secrethash.name] != secretHash) {
+        return null;
+      }
+
+      return Encryptor.decrypt(_sk + nonce.toCompressedHex(),
+          encMsg[CipheredMessageField.cipher.name]);
+    } catch (e) {
+      return null;
+    }
+  }
 
   bool verify({required String data, required String sig}) =>
       signatueVerify(publicKey, _toHash(data), sig);

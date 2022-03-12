@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/screens/scanner.dart';
 import 'package:flutter/services.dart';
@@ -30,24 +32,31 @@ class _AddKeyState extends State<AddKey> {
           IconButton(
               tooltip: 'Scan QR code',
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<String?>(
-                        builder: (context) => QrScanner())).then((value) {
-                  if (value != null && value.length <= 64) {
-                    try {
-                      var _priv = hexEncode(hexDecode(value));
-                      setState(() {
-                        _privateKey.text = _priv;
-                        _publicKey.text =
-                            DigiKey.restore(_priv).publicKey.toCompressedHex();
-                        return;
-                      });
-                    } catch (e) {
-                      snackbarAlert(context, message: 'No valid data founded.');
+                if ((Platform.isIOS || Platform.isAndroid)) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<String?>(
+                          builder: (context) => QrScanner())).then((value) {
+                    if (value != null && value.length <= 64) {
+                      try {
+                        var _priv = hexEncode(hexDecode(value));
+                        setState(() {
+                          _privateKey.text = _priv;
+                          _publicKey.text = DigiKey.restore(_priv)
+                              .publicKey
+                              .toCompressedHex();
+                          return;
+                        });
+                      } catch (e) {
+                        snackbarAlert(context,
+                            message: 'No valid data founded.');
+                      }
                     }
-                  }
-                });
+                  });
+                } else {
+                  snackbarAlert(context,
+                      message: 'Sorry! Only supported on mobile devices.');
+                }
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(

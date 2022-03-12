@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
@@ -59,14 +60,19 @@ class _SigValidatorState extends State<SigValidator> {
           IconButton(
               tooltip: 'Scan QR code',
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<String?>(
-                        builder: (context) => QrScanner())).then((value) {
-                  if (value != null && value.isNotEmpty) {
-                    _parseImportData(value);
-                  }
-                });
+                if ((Platform.isIOS || Platform.isAndroid)) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute<String?>(
+                          builder: (context) => QrScanner())).then((value) {
+                    if (value != null && value.isNotEmpty) {
+                      _parseImportData(value);
+                    }
+                  });
+                } else {
+                  snackbarAlert(context,
+                      message: 'Sorry! Only supported on mobile devices.');
+                }
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(

@@ -7,7 +7,7 @@ enum CipheredMessageField { cipher, nonce, publickey, secrethash }
 
 enum KeyActions {
   sign,
-  encdec,
+  encrypt,
   derive,
   export,
   rename,
@@ -16,7 +16,7 @@ enum KeyActions {
 
 const keyActionText = {
   'sign': 'Sign Message',
-  'encdec': 'En/Decryption',
+  'encrypt': 'Encrypt Message',
   'derive': 'Derive Key',
   'export': 'Export',
   'rename': 'Change ID',
@@ -25,6 +25,7 @@ const keyActionText = {
 
 enum Options {
   sigValidator,
+  cipherDecryptor,
   changePin,
   bioAuthControl,
   about,
@@ -32,6 +33,7 @@ enum Options {
 
 const optionsText = {
   'sigValidator': 'Signature Validator',
+  'cipherDecryptor': 'Cipher Decryptor',
   'changePin': 'Change PIN',
   'bioAuthControl': 'Biometrics Authentication',
   'about': 'About'

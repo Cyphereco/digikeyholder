@@ -10,7 +10,7 @@ import 'package:digikeyholder/services/copytoclipboard.dart';
 import 'authme.dart';
 import 'package:digikeyholder/screens/dialogs.dart';
 import 'package:digikeyholder/services/storage.dart';
-import 'package:digikeyholder/screens/encdec.dart';
+import 'package:digikeyholder/screens/encrypt.dart';
 import 'package:digikeyholder/screens/sign.dart';
 import 'package:digikeyholder/screens/exportprivkey.dart';
 
@@ -183,7 +183,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
               ),
             ));
         break;
-      case KeyActions.encdec:
+      case KeyActions.encrypt:
         Navigator.push(
             context,
             MaterialPageRoute<void>(
