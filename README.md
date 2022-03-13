@@ -16,3 +16,4 @@ Some tech insights,
 
 
 From the creator,
+This is my first Flutter app development. I might have made many mistakes. If you find any bugs or have any improvement advice, please feel free to open an issue and describe it. You are also welcome to contribute in this software or feel free to fork your branch.
