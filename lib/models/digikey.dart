@@ -84,7 +84,7 @@ class DigiKey {
     return ret;
   }
 
-  String? decryptMessage(Map encMsg, [String otherPubkey = strEmpty]) {
+  Map? decryptMessage(Map encMsg, [String otherPubkey = strEmpty]) {
     try {
       final nonce =
           PublicKey.fromHex(s256, encMsg[CipheredMessageField.nonce.name]);
@@ -93,16 +93,20 @@ class DigiKey {
           PublicKey.fromHex(s256, encMsg[CipheredMessageField.publickey.name]);
       final sumPubkey = publicKeySubstract(pubkey, nonce);
       final otherPubkey = publicKeySubstract(sumPubkey!, publicKey);
-      final _sk =
-          otherPubkey == publicKey ? _k.toHex() : computeShareKey(otherPubkey!);
+      final _sk = otherPubkey != null && otherPubkey == publicKey
+          ? _k.toHex()
+          : computeShareKey(otherPubkey!);
       final secretHash = hexEncode(RIPEMD160Digest().process(hexDecode(
           (BigInt.parse(_sk, radix: 16) + nonce.X).toRadixString(16))));
       if (encMsg[CipheredMessageField.secrethash.name] != secretHash) {
         return null;
       }
 
-      return Encryptor.decrypt(_sk + nonce.toCompressedHex(),
-          encMsg[CipheredMessageField.cipher.name]);
+      return {
+        strMessage: Encryptor.decrypt(_sk + nonce.toCompressedHex(),
+            encMsg[CipheredMessageField.cipher.name]),
+        strOtherParty: otherPubkey.toCompressedHex(),
+      };
     } catch (e) {
       return null;
     }

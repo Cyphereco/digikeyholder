@@ -40,7 +40,7 @@ class _SigValidatorState extends State<SigValidator> {
 
   @override
   Widget build(BuildContext context) {
-    const _strSignerTitle = '$strSignersPubkey:';
+    const _strSignerTitle = strSignersPubkey;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(

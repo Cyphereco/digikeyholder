@@ -23,7 +23,8 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
   final _pubkey = TextEditingController(text: strEmpty);
   final _nonce = TextEditingController(text: strEmpty);
   final _secretHash = TextEditingController(text: strEmpty);
-  final _output = TextEditingController(text: strEmpty);
+  final _message = TextEditingController(text: strEmpty);
+  final _from = TextEditingController(text: strEmpty);
   String _selKey = strEmpty;
   bool _tryAllKeys = false;
 
@@ -181,7 +182,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               controller: _pubkey,
               minLines: 1,
               maxLines: 2,
-              decoration: const InputDecoration(label: Text("$strPublicKey:")),
+              decoration: const InputDecoration(label: Text(strPublicKey)),
             ),
           ),
           Padding(
@@ -203,7 +204,8 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                   ? null
                   : () async {
                       setState(() {
-                        _output.text = strEmpty;
+                        _message.text = strEmpty;
+                        _from.text = strEmpty;
                       });
 
                       authMe(context, canCancel: true, didUnlocked: () async {
@@ -226,14 +228,15 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                                 var ret = _sk.decryptMessage(encMsg);
                                 if (ret != null && ret.isNotEmpty) {
                                   setState(() {
-                                    _output.text = ret;
+                                    _message.text = ret[strMessage];
+                                    _from.text = ret[strOtherParty];
                                   });
                                 }
                               }
                               // ignore: empty_catches
                             } catch (e) {}
 
-                            if (_output.text.isNotEmpty) break;
+                            if (_message.text.isNotEmpty) break;
                           }
                         } else {
                           try {
@@ -242,7 +245,8 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                               var ret = _sk.decryptMessage(encMsg);
                               if (ret != null && ret.isNotEmpty) {
                                 setState(() {
-                                  _output.text = ret;
+                                  _message.text = ret[strMessage];
+                                  _from.text = ret[strOtherParty];
                                 });
                               }
                             }
@@ -250,7 +254,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                           } catch (e) {}
                         }
 
-                        if (_output.text.isEmpty) {
+                        if (_message.text.isEmpty) {
                           snackbarAlert(context,
                               message: msgCantDecrypt,
                               backgroundColor: Colors.red);
@@ -262,12 +266,23 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
               child: TextField(
-                controller: _output,
+                controller: _message,
                 readOnly: true,
                 minLines: 1,
                 maxLines: 6,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(), label: Text(strOrginalMsg)),
+              )),
+          Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
+              child: TextField(
+                controller: _from,
+                readOnly: true,
+                minLines: 1,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), label: Text(strOtherParty)),
               )),
         ]),
       ),
