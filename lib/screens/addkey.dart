@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/storage.dart';
 import 'package:digikeyholder/services/snackbarnotification.dart';
+import 'package:digikeyholder/models/constants.dart';
 
 class AddKey extends StatefulWidget {
   const AddKey({required this.keyMap, Key? key}) : super(key: key);
@@ -17,9 +18,11 @@ class AddKey extends StatefulWidget {
 }
 
 class _AddKeyState extends State<AddKey> {
-  final TextEditingController _id = TextEditingController(text: '');
-  final TextEditingController _privateKey = TextEditingController(text: '');
-  final TextEditingController _publicKey = TextEditingController(text: '');
+  final TextEditingController _id = TextEditingController(text: strEmpty);
+  final TextEditingController _privateKey =
+      TextEditingController(text: strEmpty);
+  final TextEditingController _publicKey =
+      TextEditingController(text: strEmpty);
   bool _hideSecretKey = true;
 
   @override
@@ -27,10 +30,10 @@ class _AddKeyState extends State<AddKey> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Add Key'),
+        title: const Text(strAddKey),
         actions: [
           IconButton(
-              tooltip: 'Scan QR code',
+              tooltip: strScanQrCode,
               onPressed: () {
                 if ((Platform.isIOS || Platform.isAndroid)) {
                   Navigator.push(
@@ -48,19 +51,17 @@ class _AddKeyState extends State<AddKey> {
                           return;
                         });
                       } catch (e) {
-                        snackbarAlert(context,
-                            message: 'No valid data founded.');
+                        snackbarAlert(context, message: msgNoValidDataFounded);
                       }
                     }
                   });
                 } else {
-                  snackbarAlert(context,
-                      message: 'Sorry! Only supported on mobile devices.');
+                  snackbarAlert(context, message: msgUnsupportPlatform);
                 }
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
-              tooltip: 'Generate',
+              tooltip: strGenerate,
               onPressed: () {
                 setState(() {
                   DigiKey k = DigiKey();
@@ -71,12 +72,12 @@ class _AddKeyState extends State<AddKey> {
               },
               icon: const Icon(Icons.auto_awesome)),
           IconButton(
-              tooltip: 'Clear All',
+              tooltip: strClearAll,
               onPressed: () {
                 setState(() {
-                  _id.text = '';
-                  _privateKey.text = '';
-                  _publicKey.text = '';
+                  _id.text = strEmpty;
+                  _privateKey.text = strEmpty;
+                  _publicKey.text = strEmpty;
                 });
               },
               icon: const Icon(Icons.clear)),
@@ -92,7 +93,7 @@ class _AddKeyState extends State<AddKey> {
             readOnly: true,
             decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                label: Text('Public Key (Compressed)')),
+                label: Text(strPublickeyCompressed)),
           ),
         ),
         Focus(
@@ -120,7 +121,7 @@ class _AddKeyState extends State<AddKey> {
               }),
               controller: _privateKey,
               obscureText: _hideSecretKey,
-              decoration: const InputDecoration(label: Text('Private Key')),
+              decoration: const InputDecoration(label: Text(strPrivateKey)),
             ),
           ),
         ),
@@ -130,27 +131,27 @@ class _AddKeyState extends State<AddKey> {
             onChanged: (value) => setState(() {}),
             controller: _id,
             autofocus: true,
-            decoration: const InputDecoration(label: Text('ID (Key Alias)')),
+            decoration: const InputDecoration(label: Text(strIdKeyAlias)),
           ),
         ),
         TextButton(
             onPressed: (_publicKey.text.isEmpty || _id.text.isEmpty)
                 ? null
                 : () => _saveKey(),
-            child: const Text('Save')),
+            child: const Text(strSave)),
       ]),
     );
   }
 
   void _saveKey() {
     setState(() {
-      var msg = '';
+      var msg = strEmpty;
       if (_id.text.isEmpty) {
-        msg = 'Key ID cannot be empty!';
+        msg = msgKeyIdCantBeEmpty;
       } else if (widget.keyMap.containsKey(_id.text)) {
-        msg = 'Key ID duplicated! Please use a different ID.';
+        msg = msgKeyIdDuplicated;
       } else if (_privateKey.text.isEmpty) {
-        msg = 'Private Key cannot be empty!';
+        msg = msgPrivateKeyCantBeEmpty;
       }
 
       if (msg.isNotEmpty) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:digikeyholder/services/storage.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:digikeyholder/models/constants.dart';
 
 bool _authenticating = false;
 final LocalAuthentication auth = LocalAuthentication();
@@ -15,7 +16,7 @@ Future<void> authMe(BuildContext context,
   if (_authenticating) return;
   _authenticating = true;
 
-  bool _useBioAuth = await getBioAuthSwitch() == 'on' ? true : false;
+  bool _useBioAuth = await getBioAuthSwitch() == strSwitchOn ? true : false;
 
   bool _canDoBioAuth = (Platform.isIOS || Platform.isAndroid) &&
       (await auth.isDeviceSupported()) &&
@@ -23,7 +24,7 @@ Future<void> authMe(BuildContext context,
 
   if (_canDoBioAuth && _useBioAuth && !resetPin) {
     final didAuthenticate = await auth.authenticate(
-      localizedReason: 'Please authorize access',
+      localizedReason: strPleaseAuth,
       biometricOnly: false,
       stickyAuth: true,
     );
@@ -34,7 +35,7 @@ Future<void> authMe(BuildContext context,
     }
     _authenticating = false;
   } else {
-    var _pin = await getUserPin() ?? '';
+    var _pin = await getUserPin() ?? strEmpty;
     final inputController = InputController();
 
     Navigator.push(
@@ -44,7 +45,20 @@ Future<void> authMe(BuildContext context,
                   digits: 6,
                   maxRetries: _pin.isEmpty ? 0 : 3,
                   retryDelay: const Duration(seconds: 30),
-                  delayChild: const Text('Please try again in 30 seconds'),
+                  delayChild: Scaffold(
+                    // TODO: save login failure times to storage and make a custom delay
+                    // TODO: make a count down indicator
+                    body: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Expanded(child: SizedBox.expand()),
+                          Text(
+                            strPleaseTryLater,
+                            textAlign: TextAlign.center,
+                          ),
+                          Expanded(child: SizedBox.expand()),
+                        ]),
+                  ),
                   correctString: _pin,
                   confirmation: _pin.isEmpty ? true : false,
                   inputController: inputController,

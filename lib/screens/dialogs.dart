@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:digikeyholder/models/constants.dart';
 
 class DeleteConfirmationDialog extends StatelessWidget {
   DeleteConfirmationDialog(String id, {Key? key})
       : _id = id,
-        _message = id.isNotEmpty
-            ? 'Are you sure to delete this key? \n'
-            : 'Are you sure to delete all keys?',
+        _message =
+            id.isNotEmpty ? msgComfirmDeleteOneKey : msgConfirmDeleteAllKeys,
         super(key: key);
 
   final String _id;
@@ -25,17 +25,17 @@ class DeleteConfirmationDialog extends StatelessWidget {
               color: Colors.redAccent,
             ),
           ),
-          Expanded(child: Text('Delete Confirmation'))
+          Expanded(child: Text(strConfirmDelete))
         ],
       ),
       content: Text(_message + _id),
       actions: <Widget>[
         TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete')),
+            child: const Text(strDelete)),
         TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel')),
+            child: const Text(strCancel)),
       ],
     );
   }
@@ -58,7 +58,7 @@ class ChangeKeyIdDialog extends StatelessWidget {
             padding: EdgeInsets.only(right: 10.0),
             child: Icon(Icons.edit),
           ),
-          Expanded(child: Text('Change Key ID'))
+          Expanded(child: Text(strChangeKeyId))
         ],
       ),
       content: TextField(
@@ -68,10 +68,10 @@ class ChangeKeyIdDialog extends StatelessWidget {
       actions: <Widget>[
         TextButton(
             onPressed: () => Navigator.of(context).pop(_id.text),
-            child: const Text('Save')),
+            child: const Text(strSave)),
         TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel')),
+            child: const Text(strCancel)),
       ],
     );
   }
@@ -133,7 +133,7 @@ class AppInfoDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      title: const Text('About'),
+      title: const Text(strAbout),
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -143,6 +143,10 @@ class AppInfoDialog extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const Divider(),
+          const Text('by CYPHERECO'),
+          const SizedBox(
+            height: 5.0,
+          ),
           const Text('License: MIT'),
           TextField(
             readOnly: true,
@@ -155,7 +159,7 @@ class AppInfoDialog extends StatelessWidget {
       actions: <Widget>[
         TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK')),
+            child: const Text(strOk)),
       ],
     );
   }

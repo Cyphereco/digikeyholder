@@ -43,13 +43,13 @@ class DigiKey {
             .toRadixString(16));
   }
 
-  String encrypt(String m, [String p = '']) => Encryptor.encrypt(
+  String encrypt(String m, [String p = strEmpty]) => Encryptor.encrypt(
       !isValidPublicKey(p) || hexToPublicKey(p) == publicKey
           ? _k.toHex()
           : computeShareKey(hexToPublicKey(p)),
       m);
 
-  Map encryptMessage(String msg, [String otherPubkey = '']) {
+  Map encryptMessage(String msg, [String otherPubkey = strEmpty]) {
     final encMsg = {};
 
     final nonce = DigiKey();
@@ -75,7 +75,7 @@ class DigiKey {
     return encMsg;
   }
 
-  String decrypt(String c, [String p = '']) {
+  String decrypt(String c, [String p = strEmpty]) {
     var ret = Encryptor.decrypt(
         !isValidPublicKey(p) || hexToPublicKey(p) == publicKey
             ? _k.toHex()
@@ -84,7 +84,7 @@ class DigiKey {
     return ret;
   }
 
-  String? decryptMessage(Map encMsg, [String otherPubkey = '']) {
+  String? decryptMessage(Map encMsg, [String otherPubkey = strEmpty]) {
     try {
       final nonce =
           PublicKey.fromHex(s256, encMsg[CipheredMessageField.nonce.name]);
@@ -188,7 +188,7 @@ String hashMsgSha256(String data) {
             SHA256Digest().process(Uint8List.fromList(utf8.encode(data))))
         .toLowerCase();
   } catch (e) {
-    return '';
+    return strEmpty;
   }
 }
 

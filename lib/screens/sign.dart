@@ -19,19 +19,19 @@ class SignMessage extends StatefulWidget {
 }
 
 class _SignMessageState extends State<SignMessage> {
-  final _message = TextEditingController(text: '');
-  final _pubkey = TextEditingController(text: '');
-  final _signature = TextEditingController(text: '');
-  final _msgHash = TextEditingController(text: '');
+  final _message = TextEditingController(text: strEmpty);
+  final _pubkey = TextEditingController(text: strEmpty);
+  final _signature = TextEditingController(text: strEmpty);
+  final _msgHash = TextEditingController(text: strEmpty);
   late String _selKeyId;
 
   Widget resetInput() => IconButton(
-      tooltip: 'Reset input',
+      tooltip: strResetInput,
       onPressed: () {
         setState(() {
-          _message.text = '';
-          _msgHash.text = '';
-          _signature.text = '';
+          _message.text = strEmpty;
+          _msgHash.text = strEmpty;
+          _signature.text = strEmpty;
         });
       },
       icon: const Icon(Icons.replay));
@@ -45,30 +45,30 @@ class _SignMessageState extends State<SignMessage> {
 
   @override
   Widget build(BuildContext context) {
-    final _strSignerTitle = 'Signer\'s public key: ($_selKeyId)';
+    final _strSignerTitle = '$strSignersPubkey: ($_selKeyId)';
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Sign Message'),
+        title: const Text(strSignMessage),
         actions: _signature.text.isEmpty
             ? [
                 resetInput(),
               ]
             : [
                 IconButton(
-                    tooltip: 'Copy signed message',
+                    tooltip: tipCopySignedMsg,
                     onPressed: () {
                       copyToClipboardWithNotify(
-                          context, exportToJson(), 'Singed message');
+                          context, exportToJson(), strSignedMsg);
                     },
                     icon: const Icon(Icons.copy_all)),
                 IconButton(
-                    tooltip: 'Show QR code',
+                    tooltip: tipShowQrCode,
                     onPressed: () {
                       showDialog(
                           context: context,
                           builder: (context) => QrDataDialog(
-                                title: 'Signed Message',
+                                title: strSignMessage,
                                 data: exportToJson(),
                               ));
                     },
@@ -85,15 +85,14 @@ class _SignMessageState extends State<SignMessage> {
               onChanged: (value) {
                 setState(() {
                   _msgHash.text = value.isEmpty ? value : hashMsgSha256(value);
-                  _signature.text = '';
+                  _signature.text = strEmpty;
                 });
               },
               controller: _message,
               minLines: 1,
               maxLines: 10,
               autofocus: true,
-              decoration:
-                  const InputDecoration(label: Text('Message to be signed')),
+              decoration: const InputDecoration(label: Text(strMsgToSign)),
             ),
           ),
           Padding(
@@ -104,8 +103,7 @@ class _SignMessageState extends State<SignMessage> {
               maxLines: 10,
               readOnly: true,
               decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  label: Text('Message Digest (SHA256)')),
+                  border: InputBorder.none, label: Text(strMsgDigestSha256)),
             ),
           ),
           Padding(
@@ -133,19 +131,19 @@ class _SignMessageState extends State<SignMessage> {
                           });
                         });
                       }),
-              child: const Text('Sign')),
+              child: const Text(strSign)),
           Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
               child: TextField(
                 onTap: () => copyToClipboardWithNotify(
-                    context, _signature.text, txtSignature),
+                    context, _signature.text, strSignature),
                 controller: _signature,
                 readOnly: true,
                 minLines: 1,
                 maxLines: 8,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), label: Text(txtSignature)),
+                    border: OutlineInputBorder(), label: Text(strSignature)),
               )),
         ]),
       ),

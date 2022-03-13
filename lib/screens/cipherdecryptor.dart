@@ -19,12 +19,12 @@ class CipherDecryptor extends StatefulWidget {
 }
 
 class _CipherDecryptorState extends State<CipherDecryptor> {
-  final _cipher = TextEditingController(text: '');
-  final _pubkey = TextEditingController(text: '');
-  final _nonce = TextEditingController(text: '');
-  final _secretHash = TextEditingController(text: '');
-  final _output = TextEditingController(text: '');
-  String _selKey = '';
+  final _cipher = TextEditingController(text: strEmpty);
+  final _pubkey = TextEditingController(text: strEmpty);
+  final _nonce = TextEditingController(text: strEmpty);
+  final _secretHash = TextEditingController(text: strEmpty);
+  final _output = TextEditingController(text: strEmpty);
+  String _selKey = strEmpty;
   bool _tryAllKeys = false;
 
   @override
@@ -40,13 +40,14 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
       var json = jsonDecode(data);
 
       setState(() {
-        _cipher.text = json[CipheredMessageField.cipher.name] ?? '';
-        _secretHash.text = json[CipheredMessageField.secrethash.name] ?? '';
-        _pubkey.text = json[CipheredMessageField.publickey.name] ?? '';
-        _nonce.text = json[CipheredMessageField.nonce.name] ?? '';
+        _cipher.text = json[CipheredMessageField.cipher.name] ?? strEmpty;
+        _secretHash.text =
+            json[CipheredMessageField.secrethash.name] ?? strEmpty;
+        _pubkey.text = json[CipheredMessageField.publickey.name] ?? strEmpty;
+        _nonce.text = json[CipheredMessageField.nonce.name] ?? strEmpty;
       });
     } catch (e) {
-      snackbarAlert(context, message: 'Invalid content!');
+      snackbarAlert(context, message: msgInvalidContent);
     }
   }
 
@@ -55,13 +56,13 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Decrypt Cipher'),
+        title: const Text(strDecryptCipher),
         actions: [
           IconButton(
-              tooltip: 'Paste content from clipboard',
+              tooltip: tipPasteContent,
               onPressed: () async {
                 var data = await Clipboard.getData('text/plain') ??
-                    const ClipboardData(text: '');
+                    const ClipboardData(text: strEmpty);
 
                 if (data.text!.isNotEmpty) {
                   _parseImportData(data.text!);
@@ -69,7 +70,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               },
               icon: const Icon(Icons.paste)),
           IconButton(
-              tooltip: 'Scan QR code',
+              tooltip: strScanQrCode,
               onPressed: () {
                 if ((Platform.isIOS || Platform.isAndroid)) {
                   Navigator.push(
@@ -81,19 +82,18 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                     }
                   });
                 } else {
-                  snackbarAlert(context,
-                      message: 'Sorry! Only supported on mobile devices.');
+                  snackbarAlert(context, message: msgUnsupportPlatform);
                 }
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
-              tooltip: 'Reset input',
+              tooltip: strResetInput,
               onPressed: () {
                 setState(() {
-                  _cipher.text = '';
-                  _secretHash.text = '';
-                  _pubkey.text = '';
-                  _nonce.text = '';
+                  _cipher.text = strEmpty;
+                  _secretHash.text = strEmpty;
+                  _pubkey.text = strEmpty;
+                  _nonce.text = strEmpty;
                 });
               },
               icon: const Icon(Icons.replay)),
@@ -101,10 +101,13 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
       ),
       body: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(
+            height: 10.0,
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 50.0),
             child: Text(
-              'Decrypt Key:',
+              '$strDecryptKey:',
               textAlign: TextAlign.start,
             ),
           ),
@@ -130,7 +133,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               children: [
                 const Expanded(
                   child: Text(
-                    'Try All Keys:',
+                    '$strTryAllKeys:',
                     textAlign: TextAlign.end,
                   ),
                 ),
@@ -154,8 +157,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               minLines: 1,
               maxLines: 10,
               autofocus: true,
-              decoration:
-                  const InputDecoration(label: Text('Ciphered Message')),
+              decoration: const InputDecoration(label: Text(strCipherMsg)),
             ),
           ),
           Padding(
@@ -167,7 +169,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               controller: _secretHash,
               minLines: 1,
               maxLines: 3,
-              decoration: const InputDecoration(label: Text('Secret Digest')),
+              decoration: const InputDecoration(label: Text(strSecretDigest)),
             ),
           ),
           Padding(
@@ -201,7 +203,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                   ? null
                   : () async {
                       setState(() {
-                        _output.text = '';
+                        _output.text = strEmpty;
                       });
 
                       authMe(context, canCancel: true, didUnlocked: () async {
@@ -250,12 +252,12 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
 
                         if (_output.text.isEmpty) {
                           snackbarAlert(context,
-                              message: 'Cannot decrypt cipher!',
+                              message: msgCantDecrypt,
                               backgroundColor: Colors.red);
                         }
                       });
                     },
-              child: const Text('Decrypt')),
+              child: const Text(strDecrypt)),
           Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),

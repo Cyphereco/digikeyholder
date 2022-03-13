@@ -1,6 +1,89 @@
-const txtAppName = 'My Keys';
-const txtSignature = 'Signature';
-const txtCipherMsg = 'Ciphered message';
+const strAbout = 'About';
+const strActions = 'Actions';
+const strAddKey = 'Add key';
+const strAppKey = 'appKey';
+const strAppName = 'My Keys';
+const strB32Enc = 'Base32 Encode';
+const strBioAuthCtrl = 'Biometrics Authentication';
+const strBioAuthSwitch = 'bioAuthSwitch';
+const strBtcAddr = 'BTC P2PKH Address';
+const strCancel = 'Cancel';
+const strChangeId = 'Change ID';
+const strChangeKeyId = 'Change Key ID';
+const strChangePin = 'Change PIN';
+const strCipherDecryptor = 'Cipher Decryptor';
+const strCipherMsg = 'Ciphered message';
+const strClearAll = 'Clear All';
+const strClose = 'Close';
+const strCompressed = 'Compressed';
+const strConfirmDelete = 'Confirm Delete';
+const strDecrypt = 'Decrypt';
+const strDecryptCipher = 'Decrypt Cipher';
+const strDecryptKey = 'Decrypt Key';
+const strDelete = 'Delete';
+const strDeriveKey = 'Derive Key';
+const strDigest = 'Digest';
+const strEmpty = '';
+const strEmptyKeyLis = 'Empty key list';
+const strEncrypt = 'Encrypt';
+const strEncryptMessage = 'Encrypt Message';
+const strExport = 'Export';
+const strGenerate = 'Generate';
+const strId = 'ID';
+const strIdKeyAlias = '$strId ($strKeyAlias)';
+const strInvalid = 'Invalid';
+const strKeyAlias = 'Key Alias';
+const strKeyFormat = 'Key Format';
+const strKeyList = 'Key List';
+const strMsgDigest = 'Message Digest';
+const strMsgDigestSha256 = '$strMsgDigest ($strSha256)';
+const strMsgToSign = 'Message to be signed';
+const strOk = 'OK';
+const strOptions = 'Options';
+const strOrginalMsg = 'Original Message';
+const strPlainText = 'Plain Text Message';
+const strPleaseAuth = 'Please authorize access';
+const strPleaseTryLater = 'Please try again in 30 seconds';
+const strPrivateKey = 'Private Key';
+const strPublicKey = 'Public Key';
+const strPublickeyCompressed = '$strPublicKey ($strCompressed)';
+const strRaw = 'Raw';
+const strRecipient = 'Recipient';
+const strResetInput = 'Reset input';
+const strSave = 'Save';
+const strScanQrCode = 'Scan QR code';
+const strSecretDigest = 'Secret Digest';
+const strSha256 = 'SHA256';
+const strSign = 'Sign';
+const strSignedMsg = 'Singed message';
+const strSignersPubkey = 'Signer\'s public key';
+const strSignature = 'Signature';
+const strSignMessage = 'Sign Message';
+const strSigValidator = 'Signature Validator';
+const strSwitchOff = 'off';
+const strSwitchOn = 'on';
+const strTryAllKeys = 'Try All Keys';
+const strUserPin = 'userPin';
+const strValid = 'Valid';
+const strValidate = 'Validate';
+const strValidateSignature = 'Validate Signature';
+const strWIF = 'Wallet Import Format';
+
+const msgCantDecrypt = 'Cannot decrypt cipher!';
+const msgConfirmDeleteAllKeys = 'Are you sure to delete all keys?';
+const msgComfirmDeleteOneKey = 'Are you sure to delete this key? \n';
+const msgInvalidContent = 'Invalid content!';
+const msgInvalidPubkey = 'Invalid public key!';
+const msgNoValidDataFounded = 'No valid data founded.';
+const msgKeyIdCantBeEmpty = 'Key ID cannot be empty!';
+const msgKeyIdDuplicated = 'Key ID duplicated! Please use a different ID.';
+const msgPrivateKeyCantBeEmpty = 'Private Key cannot be empty!';
+const msgUnsupportPlatform = 'Sorry! Only supported on mobile devices.';
+
+const tipCopyCipherMsg = 'Copy ciphered message';
+const tipCopySignedMsg = 'Copy signed message';
+const tipPasteContent = 'Paste content from clipboard';
+const tipShowQrCode = 'Show QR code';
 
 enum SingedMessageField { message, publickey, signature }
 enum CipheredMessageField { cipher, nonce, publickey, secrethash }
@@ -14,13 +97,13 @@ enum KeyActions {
   delete,
 }
 
-const keyActionText = {
-  'sign': 'Sign Message',
-  'encrypt': 'Encrypt Message',
-  'derive': 'Derive Key',
-  'export': 'Export',
-  'rename': 'Change ID',
-  'delete': 'Delete',
+const keyActionStrs = {
+  KeyActions.sign: strSignMessage,
+  KeyActions.encrypt: strEncryptMessage,
+  // KeyActions.derive : strDeriveKey,
+  KeyActions.export: strExport,
+  KeyActions.rename: strChangeId,
+  KeyActions.delete: strDelete,
 };
 
 enum Options {
@@ -31,12 +114,12 @@ enum Options {
   about,
 }
 
-const optionsText = {
-  'sigValidator': 'Signature Validator',
-  'cipherDecryptor': 'Cipher Decryptor',
-  'changePin': 'Change PIN',
-  'bioAuthControl': 'Biometrics Authentication',
-  'about': 'About'
+const optionsStrs = {
+  Options.sigValidator: strSigValidator,
+  Options.cipherDecryptor: strCipherDecryptor,
+  Options.changePin: strChangePin,
+  Options.bioAuthControl: strBioAuthCtrl,
+  Options.about: strAbout,
 };
 
 enum PubKeyFormat {
@@ -47,12 +130,12 @@ enum PubKeyFormat {
   btcp2pkh,
 }
 
-const pubKeyFormatText = {
-  'compressed': 'Compressed',
-  'raw': 'Raw',
-  'b32comp': 'Base32 Encoded (Compressed)',
-  'b32raw': 'Base32 Encoded (Raw)',
-  'btcp2pkh': 'BTC P2PKH Address',
+const pubKeyFormatStrs = {
+  PubKeyFormat.compressed: strCompressed,
+  PubKeyFormat.raw: strRaw,
+  PubKeyFormat.b32comp: '$strB32Enc ($strCompressed)',
+  PubKeyFormat.b32raw: '$strB32Enc ($strRaw)',
+  PubKeyFormat.btcp2pkh: strBtcAddr,
 };
 
 enum PrivateKeyFormat {
@@ -61,8 +144,8 @@ enum PrivateKeyFormat {
   wif,
 }
 
-const privKeyFormatText = {
-  'raw': 'Raw',
-  'b32': 'Base32 Encoded',
-  'wif': 'Wallet Import Format',
+const privKeyFormatStrs = {
+  PrivateKeyFormat.raw: strRaw,
+  PrivateKeyFormat.b32: strB32Enc,
+  PrivateKeyFormat.wif: strWIF,
 };

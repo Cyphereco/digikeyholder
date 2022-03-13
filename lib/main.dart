@@ -24,7 +24,7 @@ void main() async {
   var _appKey = await getAppKey();
 
   // restore user pin
-  userPin = await getUserPin() ?? '';
+  userPin = await getUserPin() ?? strEmpty;
 
   // if appkey entry existed, restore it, otherwise, create a new one
   if (_appKey == null) {
@@ -40,12 +40,12 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: txtAppName,
+      title: strAppName,
       debugShowCheckedModeBanner: false,
       theme: normal(),
       darkTheme: dark(),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Key List'),
+      home: const MyHomePage(title: strKeyList),
     );
   }
 }
@@ -86,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed && await isUserPinSet()) {
+      // TODO: check login failure and delay auth
       authMe(context,
           didConfirmed: () => updateKeyMap(),
           didUnlocked: () => updateKeyMap(),
@@ -101,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void updatePreference() async {
     var _isSwitchOn = await getBioAuthSwitch();
     setState(() {
-      _useBioAuth = _isSwitchOn == 'on' ? true : false;
+      _useBioAuth = _isSwitchOn == strSwitchOn ? true : false;
     });
   }
 
@@ -130,13 +131,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         title: Text(widget.title),
         actions: [
           IconButton(
-              tooltip: 'Empty key list',
+              tooltip: strEmptyKeyLis,
               onPressed: () =>
                   authMe(context, didUnlocked: _deleteAllKeys, canCancel: true),
               icon: const Icon(Icons.delete_forever)),
           PopupMenuButton<Options>(
               icon: const Icon(Icons.extension),
-              tooltip: 'Options',
+              tooltip: strOptions,
               onSelected: (Options action) {
                 switch (action) {
                   case Options.about:
@@ -163,7 +164,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   case Options.bioAuthControl:
                     setState(() {
                       _useBioAuth = !_useBioAuth;
-                      setBioAuthSwitch(_useBioAuth ? 'on' : 'off');
+                      setBioAuthSwitch(
+                          _useBioAuth ? strSwitchOn : strSwitchOff);
                     });
                     break;
                   case Options.changePin:
@@ -176,22 +178,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       e.name != Options.bioAuthControl.name))
                   .map((e) => PopupMenuItem<Options>(
                         child: e.name != Options.bioAuthControl.name
-                            ? Text(optionsText[e.name]!)
+                            ? Text(optionsStrs[e]!)
                             : StatefulBuilder(
                                 builder: (BuildContext context,
                                         StateSetter setState) =>
                                     Row(
                                       children: [
-                                        Expanded(
-                                            child: Text(optionsText[e.name]!)),
+                                        Expanded(child: Text(optionsStrs[e]!)),
                                         Switch(
-                                          key: const Key('switchBioAuth'),
+                                          // key: const Key('switchBioAuth'),
                                           value: _useBioAuth,
                                           onChanged: (isOn) {
                                             setState(() {
                                               _useBioAuth = isOn;
-                                              setBioAuthSwitch(
-                                                  isOn ? 'on' : 'off');
+                                              setBioAuthSwitch(isOn
+                                                  ? strSwitchOn
+                                                  : strSwitchOff);
                                             });
                                           },
                                         ),
@@ -246,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       ) //SignMessage(),
                   )).whenComplete(() => updateKeyMap());
         },
-        tooltip: 'Add key',
+        tooltip: strAddKey,
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -255,7 +257,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void _deleteAllKeys() async {
     await Future.delayed(const Duration(milliseconds: 150));
     final result = await showDialog<bool>(
-        context: context, builder: (context) => DeleteConfirmationDialog(''));
+        context: context,
+        builder: (context) => DeleteConfirmationDialog(strEmpty));
     if (result ?? false) {
       await clearKeys();
       updateKeyMap();

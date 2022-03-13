@@ -17,40 +17,40 @@ class SigValidator extends StatefulWidget {
 }
 
 class _SigValidatorState extends State<SigValidator> {
-  final _message = TextEditingController(text: '');
-  final _pubkey = TextEditingController(text: '');
-  final _signature = TextEditingController(text: '');
-  final _msgHash = TextEditingController(text: '');
+  final _message = TextEditingController(text: strEmpty);
+  final _pubkey = TextEditingController(text: strEmpty);
+  final _signature = TextEditingController(text: strEmpty);
+  final _msgHash = TextEditingController(text: strEmpty);
 
   void _parseImportData(String data) {
     try {
       var json = jsonDecode(data);
 
       setState(() {
-        _message.text = json[SingedMessageField.message.name] ?? '';
+        _message.text = json[SingedMessageField.message.name] ?? strEmpty;
         _msgHash.text =
-            _message.text.isEmpty ? '' : hashMsgSha256(_message.text);
-        _pubkey.text = json[SingedMessageField.publickey.name] ?? '';
-        _signature.text = json[SingedMessageField.signature.name] ?? '';
+            _message.text.isEmpty ? strEmpty : hashMsgSha256(_message.text);
+        _pubkey.text = json[SingedMessageField.publickey.name] ?? strEmpty;
+        _signature.text = json[SingedMessageField.signature.name] ?? strEmpty;
       });
     } catch (e) {
-      snackbarAlert(context, message: 'Invalid content!');
+      snackbarAlert(context, message: msgInvalidContent);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const _strSignerTitle = 'Signer\'s public key:';
+    const _strSignerTitle = '$strSignersPubkey:';
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Validate Signature'),
+        title: const Text(strValidateSignature),
         actions: [
           IconButton(
-              tooltip: 'Paste content from clipboard',
+              tooltip: tipPasteContent,
               onPressed: () async {
                 var data = await Clipboard.getData('text/plain') ??
-                    const ClipboardData(text: '');
+                    const ClipboardData(text: strEmpty);
 
                 if (data.text!.isNotEmpty) {
                   _parseImportData(data.text!);
@@ -58,7 +58,7 @@ class _SigValidatorState extends State<SigValidator> {
               },
               icon: const Icon(Icons.paste)),
           IconButton(
-              tooltip: 'Scan QR code',
+              tooltip: strScanQrCode,
               onPressed: () {
                 if ((Platform.isIOS || Platform.isAndroid)) {
                   Navigator.push(
@@ -70,19 +70,18 @@ class _SigValidatorState extends State<SigValidator> {
                     }
                   });
                 } else {
-                  snackbarAlert(context,
-                      message: 'Sorry! Only supported on mobile devices.');
+                  snackbarAlert(context, message: msgUnsupportPlatform);
                 }
               },
               icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
-              tooltip: 'Reset input',
+              tooltip: strResetInput,
               onPressed: () {
                 setState(() {
-                  _message.text = '';
-                  _msgHash.text = '';
-                  _pubkey.text = '';
-                  _signature.text = '';
+                  _message.text = strEmpty;
+                  _msgHash.text = strEmpty;
+                  _pubkey.text = strEmpty;
+                  _signature.text = strEmpty;
                 });
               },
               icon: const Icon(Icons.replay)),
@@ -103,13 +102,12 @@ class _SigValidatorState extends State<SigValidator> {
               minLines: 1,
               maxLines: 10,
               autofocus: true,
-              decoration:
-                  const InputDecoration(label: Text('Original Message')),
+              decoration: const InputDecoration(label: Text(strOrginalMsg)),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 50.0),
-            child: Text('Digest (SHA256): ' + _msgHash.text),
+            child: Text('$strDigest ($strSha256): ' + _msgHash.text),
           ),
           Padding(
             padding:
@@ -138,7 +136,7 @@ class _SigValidatorState extends State<SigValidator> {
                 maxLines: 4,
                 maxLength: 144,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(), label: Text(txtSignature)),
+                    border: OutlineInputBorder(), label: Text(strSignature)),
               )),
           TextButton(
               onPressed: (_message.text.isEmpty ||
@@ -150,7 +148,7 @@ class _SigValidatorState extends State<SigValidator> {
                         hexToPublicKey(_pubkey.text);
                       } catch (e) {
                         snackbarAlert(context,
-                            message: 'Invalid public key!',
+                            message: msgInvalidPubkey,
                             backgroundColor: Colors.red);
                         setState(() {
                           _pubkey.clear();
@@ -167,11 +165,11 @@ class _SigValidatorState extends State<SigValidator> {
                       }
                       snackbarAlert(context,
                           message: isValid
-                              ? 'Valid signature'
-                              : 'Invalid signature!',
+                              ? '$strValid $strSignature'
+                              : '$strInvalid $strSignature!',
                           backgroundColor: isValid ? Colors.green : Colors.red);
                     },
-              child: const Text('Validate')),
+              child: const Text(strValidate)),
         ]),
       ),
     );

@@ -1,14 +1,11 @@
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:digikeyholder/models/constants.dart';
 
 const storage = FlutterSecureStorage();
 
-const strAppKey = 'appKey';
-const strUserPin = 'userPin';
-const strBioAuthSwitch = 'bioAuthSwitch';
-
-String userPin = '';
+String userPin = strEmpty;
 
 Future<Map<String, String>> getAllKeys() async {
   Map<String, String> _keys = {};
@@ -61,7 +58,7 @@ void setBioAuthSwitch(String onOff) async {
 }
 
 Future<String> getBioAuthSwitch() async =>
-    await storage.read(key: strBioAuthSwitch) ?? 'off';
+    await storage.read(key: strBioAuthSwitch) ?? strSwitchOff;
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 

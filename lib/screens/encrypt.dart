@@ -23,13 +23,11 @@ class EncryptDecrypt extends StatefulWidget {
 }
 
 class _EncryptDecryptState extends State<EncryptDecrypt> {
-  final _input = TextEditingController(text: '');
-  final _otherPubkey = TextEditingController(text: '');
-  final _output = TextEditingController(text: '');
+  final _input = TextEditingController(text: strEmpty);
+  final _otherPubkey = TextEditingController(text: strEmpty);
+  final _output = TextEditingController(text: strEmpty);
 
-  static const _strEnc = 'Encrypt';
-  static const _strPlainText = 'Plain Text Message';
-  static const _strCipherMsg = 'Ciphered Message';
+  static const _strCipherMsg = strCipherMsg;
 
   var cipherMsg = {};
 
@@ -43,24 +41,24 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Encrypt Message'),
+        title: const Text(strEncryptMessage),
         actions: _output.text.isEmpty
             ? null
             : [
                 IconButton(
-                    tooltip: 'Copy ciphered message',
+                    tooltip: tipCopyCipherMsg,
                     onPressed: () {
                       copyToClipboardWithNotify(
-                          context, jsonEncode(cipherMsg), 'Ciphered message');
+                          context, jsonEncode(cipherMsg), strCipherMsg);
                     },
                     icon: const Icon(Icons.copy)),
                 IconButton(
-                    tooltip: 'Show QR code',
+                    tooltip: tipShowQrCode,
                     onPressed: () {
                       showDialog(
                           context: context,
                           builder: (context) => QrDataDialog(
-                                title: 'Ciphered Message',
+                                title: strCipherMsg,
                                 data: jsonEncode(cipherMsg),
                               ));
                     },
@@ -92,7 +90,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                     maxLines: 1,
                     maxLength: 130,
                     decoration: const InputDecoration(
-                        label: Text('Recipient\'s Public Key')),
+                        label: Text('$strRecipient\'s $strPublicKey')),
                   ),
                 ),
                 IconButton(
@@ -112,9 +110,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                           }
                         });
                       } else {
-                        snackbarAlert(context,
-                            message:
-                                'Sorry! Only supported on mobile devices.');
+                        snackbarAlert(context, message: msgUnsupportPlatform);
                       }
                     },
                     icon: const Icon(Icons.qr_code_scanner_outlined)),
@@ -127,7 +123,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  _output.text = '';
+                  _output.text = strEmpty;
                   cipherMsg = {};
                 });
               },
@@ -135,7 +131,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
               minLines: 1,
               maxLines: 10,
               autofocus: true,
-              decoration: const InputDecoration(label: Text(_strPlainText)),
+              decoration: const InputDecoration(label: Text(strPlainText)),
             ),
           ),
           TextButton(
@@ -147,7 +143,7 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                             hexToPublicKey(_otherPubkey.text);
                           } catch (e) {
                             snackbarAlert(context,
-                                message: 'Invalid public key!',
+                                message: msgInvalidPubkey,
                                 backgroundColor: Colors.red);
                             return;
                           }
@@ -164,13 +160,13 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                           }
                         });
                       }),
-              child: const Text(_strEnc)),
+              child: const Text(strEncrypt)),
           Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 50.0, vertical: 20.0),
               child: TextField(
                 onTap: () => copyToClipboardWithNotify(
-                    context, _output.text, txtCipherMsg),
+                    context, _output.text, strCipherMsg),
                 controller: _output,
                 readOnly: true,
                 minLines: 1,

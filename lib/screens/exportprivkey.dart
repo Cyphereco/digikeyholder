@@ -46,7 +46,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 20),
           child: Column(children: [
-            const Text('Key Format:'),
+            const Text('$strKeyFormat:'),
             DropdownButton<PrivateKeyFormat>(
                 value: _format,
                 isExpanded: true,
@@ -70,7 +70,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                 },
                 items: PrivateKeyFormat.values
                     .map((e) => DropdownMenuItem<PrivateKeyFormat>(
-                        value: e, child: Text(privKeyFormatText[e.name]!)))
+                        value: e, child: Text(privKeyFormatStrs[e]!)))
                     .toList()),
             Container(
               padding: const EdgeInsets.all(15.0),
@@ -96,12 +96,12 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                   readOnly: true,
                   onTap: () {
                     copyToClipboardWithNotify(context, _privKey.text,
-                        '${privKeyFormatText[_format.name]} Publc Key');
+                        '${privKeyFormatStrs[_format]} $strPublicKey');
                   },
                 )),
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close')),
+                child: const Text(strClose)),
           ]),
         ));
   }

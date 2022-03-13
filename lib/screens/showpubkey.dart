@@ -56,14 +56,14 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
           ),
           actions: [
             PopupMenuButton(
-                tooltip: 'Actions',
+                tooltip: strActions,
                 onSelected: (KeyActions op) {
                   _doFunc(op);
                 },
                 itemBuilder: (BuildContext context) => KeyActions.values
                     .map((e) => PopupMenuItem<KeyActions>(
                           value: e,
-                          child: Text(keyActionText[e.name]!),
+                          child: Text(keyActionStrs[e]!),
                         ))
                     .toList()),
           ],
@@ -71,7 +71,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 20),
           child: Column(children: [
-            const Text('Key Format:'),
+            const Text('$strKeyFormat:'),
             DropdownButton<PubKeyFormat>(
                 value: _format,
                 isExpanded: true,
@@ -102,7 +102,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                 },
                 items: PubKeyFormat.values
                     .map((e) => DropdownMenuItem<PubKeyFormat>(
-                        value: e, child: Text(pubKeyFormatText[e.name]!)))
+                        value: e, child: Text(pubKeyFormatStrs[e]!)))
                     .toList()),
             Container(
               padding: const EdgeInsets.all(15.0),
@@ -128,12 +128,12 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   readOnly: true,
                   onTap: () {
                     copyToClipboardWithNotify(context, _pubKey.text,
-                        '${pubKeyFormatText[_format.name]} Publc Key');
+                        '${pubKeyFormatStrs[_format]} $strPublicKey');
                   },
                 )),
             TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close')),
+                child: const Text(strClose)),
           ]),
         ));
   }
@@ -166,7 +166,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
             });
           } else {
             snackbarAlert(context,
-                message: 'Key ID duplicated!', backgroundColor: Colors.red);
+                message: msgKeyIdDuplicated, backgroundColor: Colors.red);
           }
         }
         break;
