@@ -84,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && await isUserPinSet()) {
+    if (state == AppLifecycleState.resumed) {
       // TODO: check login failure and delay auth
       authMe(context,
           didConfirmed: () => updateKeyMap(),
