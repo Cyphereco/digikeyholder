@@ -1,4 +1,4 @@
-const txtAppName = 'DigiKey Holder';
+const txtAppName = 'My Keys';
 const txtSignature = 'Signature';
 const txtCipherMsg = 'Ciphered message';
 
