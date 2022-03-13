@@ -22,7 +22,6 @@ void main() async {
 
   // Read appKey from the securestorage
   var _appKey = await getAppKey();
-
   // restore user pin
   userPin = await getUserPin() ?? strEmpty;
 
@@ -230,8 +229,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                                   color: Colors.grey,
                                 )),
                             Expanded(
-                                child:
-                                    Text(_keyMap.entries.toList()[index].value))
+                              child: Text(
+                                _keyMap.entries.toList()[index].value,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
                           ]),
                         )))
           ],

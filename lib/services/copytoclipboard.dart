@@ -9,5 +9,5 @@ void copyToClipboardWithNotify(BuildContext context, String str,
 
   Clipboard.setData(ClipboardData(text: str));
   snackbarAlert(context,
-      message: '${srcName.isNotEmpty ? srcName : 'Data'} copied.');
+      message: '${srcName.isNotEmpty ? srcName : strData} $strCopied.');
 }

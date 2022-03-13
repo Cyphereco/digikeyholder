@@ -116,7 +116,7 @@ class QrDataDialog extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("OK")),
+              child: const Text(strOk)),
           const SizedBox(
             height: 20.0,
           ),

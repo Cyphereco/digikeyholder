@@ -181,7 +181,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
               controller: _pubkey,
               minLines: 1,
               maxLines: 2,
-              decoration: const InputDecoration(label: Text("Public key:")),
+              decoration: const InputDecoration(label: Text("$strPublicKey:")),
             ),
           ),
           Padding(
@@ -267,8 +267,7 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
                 minLines: 1,
                 maxLines: 6,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    label: Text("Original Message")),
+                    border: OutlineInputBorder(), label: Text(strOrginalMsg)),
               )),
         ]),
       ),

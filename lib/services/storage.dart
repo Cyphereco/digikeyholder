@@ -17,7 +17,7 @@ Future<Map<String, String>> getAllKeys() async {
   var entries = await readAllEntries();
 
   for (var key in entries.keys) {
-    if (key != strAppKey && key != strUserPin && key != strBioAuthSwitch) {
+    if (AppSettings.values.where((element) => element.name == key).isEmpty) {
       var val = _appKey.decrypt(entries[key]!);
       if (val.isNotEmpty) {
         _keys[key] = DigiKey.restore(val).compressedPublic;
@@ -29,16 +29,21 @@ Future<Map<String, String>> getAllKeys() async {
 }
 
 Future<DigiKey?> getKey(String id) async {
-  final _hex = await readEntry(id);
-  return _hex == null || _hex.isEmpty ? null : DigiKey.restore(_hex);
+  if (AppSettings.values.where((element) => element.name == id).isEmpty) {
+    final _hex = await readEntry(id);
+    return _hex == null || _hex.isEmpty ? null : DigiKey.restore(_hex);
+  }
+  return null;
 }
 
 void saveKey(String id, String key) {
-  writeEntry(id, key);
+  if (AppSettings.values.where((element) => element.name == id).isEmpty) {
+    writeEntry(id, key);
+  }
 }
 
 void deleteKey(String id) {
-  if (id != strAppKey && id != strUserPin && id != strBioAuthSwitch) {
+  if (AppSettings.values.where((element) => element.name == id).isEmpty) {
     storage.delete(key: id);
   }
 }
@@ -54,40 +59,44 @@ Future<void> clearKeys() async {
 }
 
 void setBioAuthSwitch(String onOff) async {
-  await storage.write(key: strBioAuthSwitch, value: onOff);
+  await storage.write(key: AppSettings.bioAuthSwitch___.name, value: onOff);
 }
 
 Future<String> getBioAuthSwitch() async =>
-    await storage.read(key: strBioAuthSwitch) ?? strSwitchOff;
+    await storage.read(key: AppSettings.bioAuthSwitch___.name) ?? strSwitchOff;
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 
-Future<String?> getAppKey() async => await storage.read(key: strAppKey);
+Future<String?> getAppKey() async =>
+    await storage.read(key: AppSettings.appKey___.name);
 
 Future<void> setAppKey(String value) async {
   try {
     hexDecode(value);
-    await storage.write(key: strAppKey, value: value);
+    await storage.write(key: AppSettings.appKey___.name, value: value);
   } catch (e) {
     return;
   }
 }
 
-void resetAppKey() => storage.delete(key: strAppKey);
+void resetAppKey() => storage.delete(key: AppSettings.appKey___.name);
 
-Future<bool> isUserPinSet() async => await storage.containsKey(key: strUserPin);
+Future<bool> isUserPinSet() async =>
+    await storage.containsKey(key: AppSettings.userPin___.name);
 
 void setUserPin(String value) {
-  writeEntry(strUserPin, value);
+  writeEntry(AppSettings.userPin___.name, value);
   userPin = value;
 }
 
-Future<String?> getUserPin() async => await readEntry(strUserPin);
+Future<String?> getUserPin() async =>
+    await readEntry(AppSettings.userPin___.name);
 
-Future<void> resetUserPin() async => await deleteEntry(strUserPin);
+Future<void> resetUserPin() async =>
+    await deleteEntry(AppSettings.userPin___.name);
 
 Future<bool> isUserPinMatched(String value) async =>
-    await readEntry(strUserPin) == value;
+    await readEntry(AppSettings.userPin___.name) == value;
 
 Future<String?> readEntry(String key) async {
   var _sk = await getAppKey();

@@ -55,11 +55,16 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                 IconButton(
                     tooltip: tipShowQrCode,
                     onPressed: () {
+                      var qrdata = jsonEncode(cipherMsg);
+                      if (qrdata.length > 1440) {
+                        snackbarAlert(context, message: strOversizeData);
+                        return;
+                      }
                       showDialog(
                           context: context,
                           builder: (context) => QrDataDialog(
                                 title: strCipherMsg,
-                                data: jsonEncode(cipherMsg),
+                                data: qrdata,
                               ));
                     },
                     icon: const Icon(Icons.qr_code)),

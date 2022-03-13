@@ -1,11 +1,20 @@
+enum AppSettings {
+  // ignore: constant_identifier_names
+  appKey___,
+  // ignore: constant_identifier_names
+  bioAuthSwitch___,
+  // ignore: constant_identifier_names
+  userPin___,
+  // ignore: constant_identifier_names
+  authFailures___,
+}
+
 const strAbout = 'About';
 const strActions = 'Actions';
 const strAddKey = 'Add key';
-const strAppKey = 'appKey';
 const strAppName = 'My Keys';
 const strB32Enc = 'Base32 Encode';
 const strBioAuthCtrl = 'Biometrics Authentication';
-const strBioAuthSwitch = 'bioAuthSwitch';
 const strBtcAddr = 'BTC P2PKH Address';
 const strCancel = 'Cancel';
 const strChangeId = 'Change ID';
@@ -17,6 +26,8 @@ const strClearAll = 'Clear All';
 const strClose = 'Close';
 const strCompressed = 'Compressed';
 const strConfirmDelete = 'Confirm Delete';
+const strCopied = 'copied';
+const strData = 'Data';
 const strDecrypt = 'Decrypt';
 const strDecryptCipher = 'Decrypt Cipher';
 const strDecryptKey = 'Decrypt Key';
@@ -41,6 +52,7 @@ const strMsgToSign = 'Message to be signed';
 const strOk = 'OK';
 const strOptions = 'Options';
 const strOrginalMsg = 'Original Message';
+const strOversizeData = 'Data size exceeds the QR code limit!';
 const strPlainText = 'Plain Text Message';
 const strPleaseAuth = 'Please authorize access';
 const strPleaseTryLater = 'Please try again in 30 seconds';
@@ -63,7 +75,6 @@ const strSigValidator = 'Signature Validator';
 const strSwitchOff = 'off';
 const strSwitchOn = 'on';
 const strTryAllKeys = 'Try All Keys';
-const strUserPin = 'userPin';
 const strValid = 'Valid';
 const strValidate = 'Validate';
 const strValidateSignature = 'Validate Signature';

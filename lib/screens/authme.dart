@@ -41,6 +41,7 @@ Future<void> authMe(BuildContext context,
     Navigator.push(
         context,
         MaterialPageRoute<void>(
+            fullscreenDialog: true,
             builder: (context) => ScreenLock(
                   digits: 6,
                   maxRetries: _pin.isEmpty ? 0 : 3,

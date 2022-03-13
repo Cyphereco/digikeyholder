@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:digikeyholder/services/copytoclipboard.dart';
 
+import '../services/snackbarnotification.dart';
+
 class SignMessage extends StatefulWidget {
   final String selectedKey;
   final String pubkey;
@@ -65,11 +67,17 @@ class _SignMessageState extends State<SignMessage> {
                 IconButton(
                     tooltip: tipShowQrCode,
                     onPressed: () {
+                      var qrdata = exportToJson();
+                      if (qrdata.length > 1440) {
+                        snackbarAlert(context, message: strOversizeData);
+                        return;
+                      }
+
                       showDialog(
                           context: context,
                           builder: (context) => QrDataDialog(
                                 title: strSignMessage,
-                                data: exportToJson(),
+                                data: qrdata,
                               ));
                     },
                     icon: const Icon(Icons.qr_code)),
