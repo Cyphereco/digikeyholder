@@ -84,7 +84,7 @@ class DigiKey {
     return ret;
   }
 
-  Map? decryptMessage(Map encMsg, [String otherPubkey = strEmpty]) {
+  Map? decryptMessage(Map encMsg) {
     try {
       final nonce =
           PublicKey.fromHex(s256, encMsg[CipheredMessageField.nonce.name]);
