@@ -2,6 +2,7 @@
 An off-line SECP256K1 digital key manager for Android, iOS, Windows, and MacOS written in Dart/Flutter.
 
 What is it for?
+
 Generate/import Elliptic Curve (SECP256K1) keys and save them in local storage with encryption. A user can then uses these keys to sign, encrypt, and decrypt messages and so on.
 
 What does it do?
