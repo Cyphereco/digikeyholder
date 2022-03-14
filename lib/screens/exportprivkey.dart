@@ -37,7 +37,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                   angle: 0.5 * pi,
                   child: const Icon(
                     Icons.key,
-                    color: Colors.red,
+                    color: Color.fromARGB(255, 255, 95, 95),
                   )),
               Expanded(child: Text(widget._id)),
             ],
@@ -82,7 +82,7 @@ class _ExportPrivateKeyState extends State<ExportPrivateKey> {
                   child: QrImage(
                     data: _privKey.text,
                     size: 180,
-                    backgroundColor: Colors.pink,
+                    backgroundColor: const Color.fromARGB(255, 255, 95, 95),
                   )),
             ),
             Flexible(

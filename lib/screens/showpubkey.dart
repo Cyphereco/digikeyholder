@@ -49,7 +49,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   angle: 0.5 * pi,
                   child: const Icon(
                     Icons.key,
-                    color: Colors.green,
+                    color: Color.fromARGB(255, 0, 255, 155),
                   )),
               Expanded(child: Text(_id)),
             ],
@@ -114,7 +114,7 @@ class _ShowPublicKeyState extends State<ShowPublicKey> {
                   child: QrImage(
                     data: _pubKey.text,
                     size: 180,
-                    backgroundColor: Colors.green,
+                    backgroundColor: const Color.fromARGB(255, 0, 255, 155),
                   )),
             ),
             Flexible(
