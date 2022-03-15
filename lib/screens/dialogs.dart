@@ -138,8 +138,9 @@ class AppInfoDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
+          const Text('My Keys'),
           const Text(
-            'Version :  0.0.1',
+            'Version :  1.0.1',
             textAlign: TextAlign.center,
           ),
           const Divider(),
