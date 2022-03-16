@@ -12,7 +12,6 @@ import 'screens/addkey.dart';
 import 'screens/authme.dart';
 import 'screens/showpubkey.dart';
 import 'screens/dialogs.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 var logger = Logger();
 
@@ -71,11 +70,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _useBioAuth = false;
   Map<String, String> _keyMap = {};
-  PackageInfo pkgInfo = PackageInfo(
-      appName: 'Unknown',
-      packageName: 'Unknown',
-      version: 'Unknown',
-      buildNumber: 'Unknown');
 
   Future<void> updateKeyMap() async {
     final all = await getAllKeys();
@@ -105,10 +99,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void updatePreference() async {
-    if (pkgInfo.appName == 'Unknown') {
-      pkgInfo = await PackageInfo.fromPlatform();
-    }
-
     var _isSwitchOn = await getBioAuthSwitch();
     setState(() {
       _useBioAuth = _isSwitchOn == strSwitchOn ? true : false;
@@ -152,10 +142,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   case Options.about:
                     showDialog<bool>(
                         context: context,
-                        builder: (context) => AppInfoDialog(
-                              appName: pkgInfo.appName,
-                              version: pkgInfo.version,
-                            ));
+                        builder: (context) => const AppInfoDialog());
                     break;
                   case Options.sigValidator:
                     Navigator.push(
