@@ -106,7 +106,7 @@ bool Win32Window::CreateAndShow(const std::wstring& title,
                                 const Point& origin,
                                 const Size& size) {
 
-HANDLE hMutexHandle=CreateMutex(NULL, TRUE, L"mykeys.cyphereco.com");
+HANDLE hMutexHandle=CreateMutex(NULL, TRUE, L"digikeyholder.cyphereco.com");
 HWND handle=FindWindowA(NULL, "My Keys");
 
   if (GetLastError() == ERROR_ALREADY_EXISTS)

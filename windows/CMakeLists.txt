@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(digikeyholder LANGUAGES CXX)
 
-set(BINARY_NAME "mykeys")
+set(BINARY_NAME "digikeyholder")
 
 cmake_policy(SET CMP0063 NEW)
 
