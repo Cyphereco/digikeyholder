@@ -2,7 +2,7 @@
     package="com.cyphereco.mykeys">
    <application
         android:label="My Keys"
-        android:name="com.example.digikeyholder"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
