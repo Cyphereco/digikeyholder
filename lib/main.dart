@@ -12,6 +12,7 @@ import 'screens/addkey.dart';
 import 'screens/authme.dart';
 import 'screens/showpubkey.dart';
 import 'screens/dialogs.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 var logger = Logger();
 
@@ -70,8 +71,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _useBioAuth = false;
   Map<String, String> _keyMap = {};
+  PackageInfo pkgInfo = PackageInfo(
+      appName: strAppName,
+      packageName: 'com.cyphereco.mykes',
+      version: '1.0.1',
+      buildNumber: 's');
 
   Future<void> updateKeyMap() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      if (pkgInfo.buildNumber == 's') {
+        pkgInfo = await PackageInfo.fromPlatform();
+      }
+    }
     final all = await getAllKeys();
     var _list = all.entries.toList();
     _list.sort(
@@ -142,7 +153,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   case Options.about:
                     showDialog<bool>(
                         context: context,
-                        builder: (context) => const AppInfoDialog());
+                        builder: (context) => AppInfoDialog(
+                              appName: pkgInfo.appName,
+                              version: pkgInfo.version,
+                              buildNumber: pkgInfo.buildNumber == 's'
+                                  ? ''
+                                  : '(${pkgInfo.buildNumber})',
+                            ));
                     break;
                   case Options.sigValidator:
                     Navigator.push(

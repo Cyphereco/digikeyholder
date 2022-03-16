@@ -127,7 +127,15 @@ class QrDataDialog extends StatelessWidget {
 }
 
 class AppInfoDialog extends StatelessWidget {
-  const AppInfoDialog({Key? key}) : super(key: key);
+  const AppInfoDialog(
+      {Key? key,
+      required this.appName,
+      required this.version,
+      required this.buildNumber})
+      : super(key: key);
+  final String appName;
+  final String version;
+  final String buildNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +146,9 @@ class AppInfoDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(strAppName),
-          const Text(
-            'Version : 1.0.1',
+          Text(appName),
+          Text(
+            'Version : $version $buildNumber',
             textAlign: TextAlign.center,
           ),
           const Divider(),
@@ -159,10 +167,11 @@ class AppInfoDialog extends StatelessWidget {
             style: TextStyle(fontSize: 12.0),
           ),
           TextField(
+            textAlign: TextAlign.center,
             readOnly: true,
             style: const TextStyle(fontSize: 12.0),
             controller: TextEditingController(
-                text: 'github.com/cyphereco/digikeyholder'),
+                text: 'https://github.com/cyphereco/digikeyholder'),
             decoration: const InputDecoration(border: InputBorder.none),
           )
         ],
