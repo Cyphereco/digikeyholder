@@ -138,18 +138,29 @@ class AppInfoDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
+          const Text(strAppName),
           const Text(
-            'Version :  0.0.1',
+            'Version :  1.0.1',
             textAlign: TextAlign.center,
           ),
           const Divider(),
-          const Text('by CYPHERECO'),
           const SizedBox(
             height: 5.0,
           ),
-          const Text('License: MIT'),
+          const Text(
+            'by CYPHERECO',
+            style: TextStyle(fontSize: 12.0),
+          ),
+          const SizedBox(
+            height: 5.0,
+          ),
+          const Text(
+            'License: MIT',
+            style: TextStyle(fontSize: 12.0),
+          ),
           TextField(
             readOnly: true,
+            style: const TextStyle(fontSize: 12.0),
             controller: TextEditingController(
                 text: 'github.com/cyphereco/digikeyholder'),
             decoration: const InputDecoration(border: InputBorder.none),
