@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "digikeyholder" "\0"
+            VALUE "CompanyName", "com.cyphereco" "\0"
+            VALUE "FileDescription", "mykeys" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "digikeyholder" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "digikeyholder.exe" "\0"
-            VALUE "ProductName", "digikeyholder" "\0"
+            VALUE "InternalName", "mykeys" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 com.cyphereco. All rights reserved." "\0"
+            VALUE "OriginalFilename", "mykeys.exe" "\0"
+            VALUE "ProductName", "mykeys" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

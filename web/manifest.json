@@ -1,11 +1,11 @@
 {
-    "name": "digikeyholder",
-    "short_name": "digikeyholder",
+    "name": "mykeys",
+    "short_name": "mykeys",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Off-line Secp256k1 key manager",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
