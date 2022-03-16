@@ -140,7 +140,7 @@ class AppInfoDialog extends StatelessWidget {
         children: [
           const Text(strAppName),
           const Text(
-            'Version :  1.0.1',
+            'Version : 1.0.1',
             textAlign: TextAlign.center,
           ),
           const Divider(),
