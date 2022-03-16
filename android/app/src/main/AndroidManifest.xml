@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cyphereco.mykeys">
+    package="com.example.digikeyholder">
    <application
         android:label="My Keys"
-        android:name="${applicationName}"
+        android:name="com.example.digikeyholder"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
