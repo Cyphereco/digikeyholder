@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/constants.dart';
-import 'package:elliptic/ecdh.dart';
 import 'package:elliptic/elliptic.dart';
 import 'package:ecdsa/ecdsa.dart';
 import 'package:encryptor/encryptor.dart';
@@ -23,18 +22,7 @@ class DigiKey {
 
   String get compressedPublic => _k.publicKey.toCompressedHex();
 
-  String computeShareKey(PublicKey p) {
-    String? _sk;
-    while (_sk == null) {
-      try {
-        _sk = computeSecretHex(_k, p);
-        // print(_s256.isOnCurve(PublicKey.fromHex(_s256, _sk)));
-      } catch (e) {
-        _sk = null;
-      }
-    }
-    return _sk;
-  }
+  String computeShareKey(PublicKey p) => computeSecretHex(_k, p);
 
   PrivateKey deriveWithScalar(Uint8List scalar) {
     return PrivateKey.fromHex(
@@ -145,6 +133,7 @@ class DigiKey {
 
 bool isValidPublicKey(String p) {
   try {
+    hexDecode(p);
     PublicKey.fromHex(s256, p);
     return true;
   } catch (e) {
@@ -215,4 +204,25 @@ String deriveBtcLegacyAddr(String pubkey) {
   raw.setRange(0, 0, [0]); // add version prefix, 0x00 for mainnet
   raw.setRange(1, raw.length, ripemd160digest);
   return base58CheckEncode(raw);
+}
+
+List<int> computeSecret(PrivateKey selfPriv, PublicKey otherPub) {
+  assert(selfPriv.curve == otherPub.curve);
+
+  var curve = selfPriv.curve;
+  var byteLen = (curve.bitSize + 7) >> 3;
+  var p = curve.scalarMul(otherPub, selfPriv.bytes);
+  var hex = p.X.toRadixString(16);
+  var padding =
+      byteLen * 2 - hex.length == 0 ? '' : '0' * (byteLen * 2 - hex.length);
+  hex = padding + hex;
+  return List<int>.generate(
+      byteLen, (i) => int.parse(hex.substring(i * 2, i * 2 + 2), radix: 16));
+}
+
+String computeSecretHex(PrivateKey selfPriv, PublicKey otherPub) {
+  var sec = computeSecret(selfPriv, otherPub);
+  return List<String>.generate(
+          sec.length, (index) => sec[index].toRadixString(16).padLeft(2, '0'))
+      .join();
 }

@@ -7,7 +7,6 @@ import 'package:logger/logger.dart';
 import 'theme/style.dart';
 import 'models/constants.dart';
 import 'services/storage.dart';
-import 'models/digikey.dart';
 import 'screens/addkey.dart';
 import 'screens/authme.dart';
 import 'screens/showpubkey.dart';
@@ -21,15 +20,8 @@ void main() async {
   // Make sure widget initialized before using storage
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Read appKey from the securestorage
-  var _appKey = await getAppKey();
   // restore user pin
   userPin = await getUserPin() ?? strEmpty;
-
-  // if appkey entry existed, restore it, otherwise, create a new one
-  if (_appKey == null) {
-    await setAppKey(DigiKey().toString());
-  }
 
   runApp(const Home());
 }

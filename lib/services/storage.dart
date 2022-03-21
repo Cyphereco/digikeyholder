@@ -67,8 +67,16 @@ Future<String> getBioAuthSwitch() async =>
 
 Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 
-Future<String?> getAppKey() async =>
-    await storage.read(key: AppSettings.appKey___.name);
+// appKey - used to encrypt user data
+Future<String?> getAppKey() async {
+  var _key = await storage.read(key: AppSettings.appKey___.name);
+  // if appKey does not exist, create one
+  if (_key == null) {
+    _key = DigiKey().toString();
+    await setAppKey(_key);
+  }
+  return _key;
+}
 
 Future<void> setAppKey(String value) async {
   try {
