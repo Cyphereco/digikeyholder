@@ -12,13 +12,15 @@ import 'screens/authme.dart';
 import 'screens/showpubkey.dart';
 import 'screens/dialogs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 var logger = Logger();
 
 // TODO: support multi-language
 void main() async {
   // Make sure widget initialized before using storage
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // restore user pin
   userPin = await getUserPin() ?? strEmpty;
@@ -115,6 +117,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    FlutterNativeSplash.remove();
+
     super.initState();
     updatePreference();
     authMe(context,
