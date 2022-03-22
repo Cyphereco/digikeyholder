@@ -8,6 +8,11 @@ import 'package:digikeyholder/models/constants.dart';
 bool _authenticating = false;
 final LocalAuthentication auth = LocalAuthentication();
 
+Future<bool> canDoBioAuth() async =>
+    (Platform.isIOS || Platform.isAndroid) &&
+    (await auth.isDeviceSupported()) &&
+    (await auth.canCheckBiometrics);
+
 Future<void> authMe(BuildContext context,
     {bool canCancel = false,
     bool resetPin = false,
@@ -18,9 +23,7 @@ Future<void> authMe(BuildContext context,
 
   bool _useBioAuth = await getBioAuthSwitch() == strSwitchOn ? true : false;
 
-  bool _canDoBioAuth = (Platform.isIOS || Platform.isAndroid) &&
-      (await auth.isDeviceSupported()) &&
-      (await auth.canCheckBiometrics);
+  bool _canDoBioAuth = await canDoBioAuth();
 
   if (_canDoBioAuth && _useBioAuth && !resetPin) {
     final didAuthenticate = await auth.authenticate(

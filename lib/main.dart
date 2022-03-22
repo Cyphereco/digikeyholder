@@ -61,6 +61,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  bool _canDoBioAuth = false;
   bool _useBioAuth = false;
   Map<String, String> _keyMap = {};
   PackageInfo pkgInfo = PackageInfo(
@@ -102,6 +103,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   void updatePreference() async {
+    _canDoBioAuth = await canDoBioAuth();
     var _isSwitchOn = await getBioAuthSwitch();
     setState(() {
       _useBioAuth = _isSwitchOn == strSwitchOn ? true : false;
@@ -182,8 +184,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 }
               },
               itemBuilder: (BuildContext context) => Options.values
-                  .where((e) => ((Platform.isIOS || Platform.isAndroid) ||
-                      e.name != Options.bioAuthControl.name))
+                  .where((e) =>
+                      (_canDoBioAuth || e.name != Options.bioAuthControl.name))
                   .map((e) => PopupMenuItem<Options>(
                         child: e.name != Options.bioAuthControl.name
                             ? Text(optionsStrs[e]!)
