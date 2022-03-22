@@ -63,6 +63,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _canDoBioAuth = false;
   bool _useBioAuth = false;
+  bool _authenticated = false;
   Map<String, String> _keyMap = {};
   PackageInfo pkgInfo = PackageInfo(
       appName: strAppName,
@@ -71,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       buildNumber: 's');
 
   Future<void> updateKeyMap() async {
+    _authenticated = true;
     if (Platform.isAndroid || Platform.isIOS) {
       if (pkgInfo.buildNumber == 's') {
         pkgInfo = await PackageInfo.fromPlatform();
@@ -88,13 +90,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.resumed && !_authenticated) {
       // TODO: check login failure and delay auth
       authMe(context,
           didConfirmed: () => updateKeyMap(),
           didUnlocked: () => updateKeyMap(),
           canCancel: false);
-    } else {
+    } else if (!authenticating && state == AppLifecycleState.paused) {
+      _authenticated = false;
       Navigator.popUntil(context, (route) => route.isFirst);
       setState(() {
         _keyMap = {};

@@ -5,7 +5,7 @@ import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:digikeyholder/models/constants.dart';
 
-bool _authenticating = false;
+bool authenticating = false;
 final LocalAuthentication auth = LocalAuthentication();
 
 Future<bool> canDoBioAuth() async =>
@@ -18,8 +18,8 @@ Future<void> authMe(BuildContext context,
     bool resetPin = false,
     Function? didUnlocked,
     Function? didConfirmed}) async {
-  if (_authenticating) return;
-  _authenticating = true;
+  if (authenticating) return;
+  authenticating = true;
 
   bool _useBioAuth = await getBioAuthSwitch() == strSwitchOn ? true : false;
 
@@ -36,7 +36,7 @@ Future<void> authMe(BuildContext context,
     } else if (!canCancel) {
       exit(0);
     }
-    _authenticating = false;
+    authenticating = false;
   } else {
     var _pin = await getUserPin() ?? strEmpty;
     final inputController = InputController();
@@ -93,7 +93,7 @@ Future<void> authMe(BuildContext context,
                     inputController.unsetConfirmed();
                   },
                 ))).whenComplete(() {
-      _authenticating = false;
+      authenticating = false;
     });
   }
 }
