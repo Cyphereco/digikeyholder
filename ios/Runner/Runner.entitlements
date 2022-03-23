@@ -7,8 +7,6 @@
 	<key>com.apple.security.device.camera</key>
 	<true/>
 	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)com.cyphereco.mykeys</string>
-	</array>
+	<array/>
 </dict>
 </plist>

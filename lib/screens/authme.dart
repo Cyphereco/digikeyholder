@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:digikeyholder/services/storage.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:digikeyholder/models/constants.dart';
@@ -25,8 +26,10 @@ Future<void> authMe(BuildContext context,
 
   bool _canDoBioAuth = await canDoBioAuth();
 
+  bool didAuthenticate = false;
+
   if (_canDoBioAuth && _useBioAuth && !resetPin) {
-    final didAuthenticate = await auth.authenticate(
+    didAuthenticate = await auth.authenticate(
       localizedReason: strPleaseAuth,
       biometricOnly: false,
       stickyAuth: true,
@@ -34,10 +37,11 @@ Future<void> authMe(BuildContext context,
     if (didAuthenticate) {
       if (didUnlocked != null) didUnlocked();
     } else if (!canCancel) {
-      exit(0);
+      SystemNavigator.pop();
     }
-    authenticating = false;
-  } else {
+  }
+
+  if (!didAuthenticate) {
     var _pin = await getUserPin() ?? strEmpty;
     final inputController = InputController();
 
@@ -92,8 +96,7 @@ Future<void> authMe(BuildContext context,
                   didError: (value) {
                     inputController.unsetConfirmed();
                   },
-                ))).whenComplete(() {
-      authenticating = false;
-    });
+                ))).whenComplete(() {});
   }
+  authenticating = false;
 }

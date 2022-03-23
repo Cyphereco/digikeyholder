@@ -13,6 +13,7 @@ import 'screens/showpubkey.dart';
 import 'screens/dialogs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 
 var logger = Logger();
 
@@ -33,13 +34,19 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: strAppName,
-      debugShowCheckedModeBanner: false,
-      theme: normal(),
-      darkTheme: dark(),
-      themeMode: ThemeMode.system,
-      home: const MyHomePage(title: strKeyList),
+    return KeyboardDismisser(
+      gestures: [
+        GestureType.onTap,
+        GestureType.onPanUpdateDownDirection,
+      ],
+      child: MaterialApp(
+        title: strAppName,
+        debugShowCheckedModeBanner: false,
+        theme: normal(),
+        darkTheme: dark(),
+        themeMode: ThemeMode.system,
+        home: const MyHomePage(title: strKeyList),
+      ),
     );
   }
 }
