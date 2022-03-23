@@ -32,12 +32,10 @@ Future<void> authMe(BuildContext context,
     didAuthenticate = await auth.authenticate(
       localizedReason: strPleaseAuth,
       biometricOnly: false,
-      stickyAuth: true,
     );
+
     if (didAuthenticate) {
       if (didUnlocked != null) didUnlocked();
-    } else if (!canCancel) {
-      SystemNavigator.pop();
     }
   }
 
