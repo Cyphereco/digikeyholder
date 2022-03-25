@@ -76,8 +76,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Map<String, String> _keyMap = {};
   PackageInfo pkgInfo = PackageInfo(
       appName: strAppName,
-      packageName: 'com.cyphereco.mykes',
-      version: '1.0.1',
+      packageName: 'com.cyphereco.mykeys',
+      version: '1.0.5',
       buildNumber: 's');
 
   Future<void> updateKeyMap() async {
