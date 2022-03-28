@@ -98,27 +98,25 @@ class _EncryptDecryptState extends State<EncryptDecrypt> {
                         label: Text('$strRecipient\'s $strPublicKey')),
                   ),
                 ),
-                IconButton(
-                    onPressed: () {
-                      if ((Platform.isIOS || Platform.isAndroid)) {
-                        Navigator.push(
-                                context,
-                                MaterialPageRoute<String?>(
-                                    builder: (context) => QrScanner()))
-                            .then((value) {
-                          if (value != null &&
-                              value.isNotEmpty &&
-                              isValidPublicKey(value)) {
-                            setState(() {
-                              _otherPubkey.text = value;
-                            });
-                          }
-                        });
-                      } else {
-                        snackbarAlert(context, message: msgUnsupportPlatform);
-                      }
-                    },
-                    icon: const Icon(Icons.qr_code_scanner_outlined)),
+                !(Platform.isIOS || Platform.isAndroid)
+                    ? const SizedBox.shrink()
+                    : IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                                  context,
+                                  MaterialPageRoute<String?>(
+                                      builder: (context) => QrScanner()))
+                              .then((value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                isValidPublicKey(value)) {
+                              setState(() {
+                                _otherPubkey.text = value;
+                              });
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.qr_code_scanner_outlined)),
               ],
             ),
           ),

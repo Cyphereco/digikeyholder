@@ -51,6 +51,7 @@ dependencies:
   package_info_plus: ^1.4.0
   flutter_native_splash: ^2.1.1
   keyboard_dismisser: ^2.0.1
+  desktop_window: ^0.4.0
 
 dev_dependencies:
   flutter_test:

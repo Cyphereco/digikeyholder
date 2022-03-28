@@ -85,6 +85,7 @@ const strWIF = 'Wallet Import Format';
 const msgCantDecrypt = 'Cannot decrypt cipher!';
 const msgConfirmDeleteAllKeys = 'Are you sure to delete all keys?';
 const msgComfirmDeleteOneKey = 'Are you sure to delete this key? \n';
+const msgCreateAkeyFirst = 'Please create a key first!';
 const msgInvalidContent = 'Invalid content!';
 const msgInvalidPubkey = 'Invalid public key!';
 const msgNoValidDataFounded = 'No valid data founded.';

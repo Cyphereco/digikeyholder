@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:digikeyholder/screens/cipherdecryptor.dart';
 import 'package:digikeyholder/screens/sigvalidator.dart';
+import 'package:digikeyholder/services/snackbarnotification.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'theme/style.dart';
@@ -13,7 +14,7 @@ import 'screens/showpubkey.dart';
 import 'screens/dialogs.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:desktop_window/desktop_window.dart';
 
 var logger = Logger();
 
@@ -34,19 +35,13 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardDismisser(
-      gestures: const [
-        GestureType.onTap,
-        GestureType.onPanUpdateDownDirection,
-      ],
-      child: MaterialApp(
-        title: strAppName,
-        debugShowCheckedModeBanner: false,
-        theme: normal(),
-        darkTheme: dark(),
-        themeMode: ThemeMode.system,
-        home: const MyHomePage(title: strKeyList),
-      ),
+    return MaterialApp(
+      title: strAppName,
+      debugShowCheckedModeBanner: false,
+      theme: normal(),
+      darkTheme: dark(),
+      themeMode: ThemeMode.system,
+      home: const MyHomePage(title: strKeyList),
     );
   }
 }
@@ -76,8 +71,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Map<String, String> _keyMap = {};
   PackageInfo pkgInfo = PackageInfo(
       appName: strAppName,
-      packageName: 'com.cyphereco.mykeys',
-      version: '1.0.5',
+      packageName: 'com.cyphereco.mykes',
+      version: '1.0.1',
       buildNumber: 's');
 
   Future<void> updateKeyMap() async {
@@ -99,9 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed &&
-        !authenticating &&
-        !_authenticated) {
+    if (state == AppLifecycleState.resumed && !_authenticated) {
       // TODO: check login failure and delay auth
       authMe(context,
           didConfirmed: () => updateKeyMap(),
@@ -122,6 +115,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     setState(() {
       _useBioAuth = _isSwitchOn == strSwitchOn ? true : false;
     });
+
+    if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+      await DesktopWindow.setMinWindowSize(const Size(360, 540));
+    }
   }
 
   @override
@@ -179,6 +176,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         ));
                     break;
                   case Options.cipherDecryptor:
+                    if (_keyMap.isEmpty) {
+                      snackbarAlert(context, message: msgCreateAkeyFirst);
+                      return;
+                    }
                     Navigator.push(
                         context,
                         MaterialPageRoute<void>(

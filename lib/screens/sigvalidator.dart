@@ -47,6 +47,24 @@ class _SigValidatorState extends State<SigValidator> {
         title: const Text(strValidateSignature),
         actions: [
           IconButton(
+              disabledColor: Theme.of(context).colorScheme.background,
+              tooltip: !(Platform.isIOS || Platform.isAndroid)
+                  ? null
+                  : strScanQrCode,
+              onPressed: !(Platform.isIOS || Platform.isAndroid)
+                  ? null
+                  : () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute<String?>(
+                              builder: (context) => QrScanner())).then((value) {
+                        if (value != null && value.isNotEmpty) {
+                          _parseImportData(value);
+                        }
+                      });
+                    },
+              icon: const Icon(Icons.qr_code_scanner_outlined)),
+          IconButton(
               tooltip: tipPasteContent,
               onPressed: () async {
                 var data = await Clipboard.getData('text/plain') ??
@@ -57,23 +75,6 @@ class _SigValidatorState extends State<SigValidator> {
                 }
               },
               icon: const Icon(Icons.paste)),
-          IconButton(
-              tooltip: strScanQrCode,
-              onPressed: () {
-                if ((Platform.isIOS || Platform.isAndroid)) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute<String?>(
-                          builder: (context) => QrScanner())).then((value) {
-                    if (value != null && value.isNotEmpty) {
-                      _parseImportData(value);
-                    }
-                  });
-                } else {
-                  snackbarAlert(context, message: msgUnsupportPlatform);
-                }
-              },
-              icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
               tooltip: strResetInput,
               onPressed: () {
