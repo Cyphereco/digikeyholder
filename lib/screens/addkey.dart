@@ -32,36 +32,33 @@ class _AddKeyState extends State<AddKey> {
       appBar: AppBar(
         title: const Text(strAddKey),
         actions: [
-          IconButton(
-              disabledColor: Theme.of(context).colorScheme.background,
-              tooltip: !(Platform.isIOS || Platform.isAndroid)
-                  ? null
-                  : strScanQrCode,
-              onPressed: !(Platform.isIOS || Platform.isAndroid)
-                  ? null
-                  : () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute<String?>(
-                              builder: (context) => QrScanner())).then((value) {
-                        if (value != null && value.length <= 64) {
-                          try {
-                            var _priv = hexEncode(hexDecode(value));
-                            setState(() {
-                              _privateKey.text = _priv;
-                              _publicKey.text = DigiKey.restore(_priv)
-                                  .publicKey
-                                  .toCompressedHex();
-                              return;
-                            });
-                          } catch (e) {
-                            snackbarAlert(context,
-                                message: msgNoValidDataFounded);
-                          }
+          !(Platform.isIOS || Platform.isAndroid)
+              ? const SizedBox.shrink()
+              : IconButton(
+                  tooltip: strScanQrCode,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<String?>(
+                            builder: (context) => QrScanner())).then((value) {
+                      if (value != null && value.length <= 64) {
+                        try {
+                          var _priv = hexEncode(hexDecode(value));
+                          setState(() {
+                            _privateKey.text = _priv;
+                            _publicKey.text = DigiKey.restore(_priv)
+                                .publicKey
+                                .toCompressedHex();
+                            return;
+                          });
+                        } catch (e) {
+                          snackbarAlert(context,
+                              message: msgNoValidDataFounded);
                         }
-                      });
-                    },
-              icon: const Icon(Icons.qr_code_scanner_outlined)),
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
               tooltip: strGenerate,
               onPressed: () {

@@ -59,24 +59,21 @@ class _CipherDecryptorState extends State<CipherDecryptor> {
       appBar: AppBar(
         title: const Text(strDecryptCipher),
         actions: [
-          IconButton(
-              disabledColor: Theme.of(context).colorScheme.background,
-              tooltip: !(Platform.isIOS || Platform.isAndroid)
-                  ? null
-                  : strScanQrCode,
-              onPressed: !(Platform.isIOS || Platform.isAndroid)
-                  ? null
-                  : () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute<String?>(
-                              builder: (context) => QrScanner())).then((value) {
-                        if (value != null && value.isNotEmpty) {
-                          _parseImportData(value);
-                        }
-                      });
-                    },
-              icon: const Icon(Icons.qr_code_scanner_outlined)),
+          !(Platform.isIOS || Platform.isAndroid)
+              ? const SizedBox.shrink()
+              : IconButton(
+                  tooltip: strScanQrCode,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<String?>(
+                            builder: (context) => QrScanner())).then((value) {
+                      if (value != null && value.isNotEmpty) {
+                        _parseImportData(value);
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.qr_code_scanner_outlined)),
           IconButton(
               tooltip: tipPasteContent,
               onPressed: () async {
