@@ -52,6 +52,7 @@ dependencies:
   flutter_native_splash: ^2.1.1
   keyboard_dismisser: ^2.0.1
   desktop_window: ^0.4.0
+  msix: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -112,3 +113,12 @@ flutter_icons:
   ios: true
   # optionally, as transparency is not allowed on app store
   remove_alpha_ios: true
+
+msix_config: 
+  identity_name: 50998QuarkLi.DigikeyHolder
+  publisher_display_name: Quark Li
+  publisher: CN=C6997450-7618-4FEC-9016-384964E1EAED
+  logo_path: "windows/runner/resources/app_icon.ico"
+  execution_alias: "My Keys"
+  store: true
+
