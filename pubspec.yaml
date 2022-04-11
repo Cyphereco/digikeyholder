@@ -120,5 +120,6 @@ msix_config:
   publisher: CN=C6997450-7618-4FEC-9016-384964E1EAED
   logo_path: "windows/runner/resources/app_icon.ico"
   execution_alias: "My Keys"
+  capabilities: ""
   store: true
 
