@@ -30,7 +30,7 @@ Future<void> authMe(BuildContext context,
   if (_canDoBioAuth && _useBioAuth && !resetPin) {
     didAuthenticate = await auth.authenticate(
       localizedReason: strPleaseAuth,
-      biometricOnly: false,
+      // biometricOnly: false,
     );
 
     if (didAuthenticate) {

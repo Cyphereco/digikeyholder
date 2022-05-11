@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   PackageInfo pkgInfo = PackageInfo(
       appName: strAppName,
       packageName: 'com.cyphereco.mykes',
-      version: '1.0.9 (10)',
+      version: '1.0.10 (11)',
       buildNumber: 's');
 
   Future<void> updateKeyMap() async {
@@ -138,12 +138,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         didConfirmed: () => updateKeyMap(),
         didUnlocked: () => updateKeyMap(),
         canCancel: false);
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -275,7 +275,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.yellow,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.yellow
+            : Colors.blueGrey,
         onPressed: () {
           Navigator.push(
               context,
