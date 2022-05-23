@@ -2,6 +2,7 @@ import 'package:base_codecs/base_codecs.dart';
 import 'package:digikeyholder/models/digikey.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:digikeyholder/models/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -69,6 +70,13 @@ Future<Map<String, String>> readAllEntries() async => await storage.readAll();
 
 // appKey - used to encrypt user data
 Future<String?> getAppKey() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  if (prefs.getBool('first_run') ?? true) {
+    await storage.deleteAll();
+    prefs.setBool('first_run', false);
+  }
+
   var _key = await storage.read(key: AppSettings.appKey___.name);
   // if appKey does not exist, create one
   if (_key == null) {

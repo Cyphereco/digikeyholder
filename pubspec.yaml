@@ -53,6 +53,7 @@ dependencies:
   msix: ^3.4.1
   qr_code_scanner: ^0.7.0
   local_auth: ^2.0.2
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:
